@@ -44,9 +44,14 @@ __lua__
 
 local function nop() end
 
-local function swapnpop(a,i)
- a[i]=a[#a]
- a[#a]=nil
+local function cleanup(a, cond)
+ for i=#a,1,-1 do
+  local o=a[i]
+  if cond(o) then
+   a[i]=a[#a]
+   a[#a]=nil
+  end
+ end
 end
 
 -->8
@@ -87,6 +92,10 @@ local function add_obj_spr(o)
  o.draw=draw_obj_spr
 end
 
+local function obj_dead(o)
+  return o.age<0
+end
+
 local function kill_obj(o)
  o.age=-1
 end
@@ -106,13 +115,8 @@ local function draw_objs()
  end
 end
 
-local function cleanup_objs()
- for i=#objs,1,-1 do
-  local o=objs[i]
-  if o.age<0 then
-   swapnpop(objs,i)
-  end
- end
+local function cleanup_dead_objs()
+ cleanup(objs, obj_dead)
 end
 
 local function clear_objs()
@@ -197,7 +201,7 @@ end
 function _update60()
   t=t+1
   update_objs()
-  cleanup_objs()
+  cleanup_dead_objs()
   if t%60>(t-1)%60 then
    add_thing()
   end
