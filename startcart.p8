@@ -59,7 +59,7 @@ local function draw_obj_circ(o)
 end
  
 local function draw_obj_spr(o)
- spr(o.spr,o.x,o.y,o.w,o.h,
+ spr(o.spri,o.x,o.y,o.w,o.h,
   o.fx,o.fy)
 end
 
@@ -81,7 +81,7 @@ end
 
 local function add_obj_spr(o)
  add_obj(o)
- o.spr=o.spr or 1
+ o.spri=o.spri or 1
  o.w=o.w or 1
  o.h=o.h or 1
  o.draw=draw_obj_spr
@@ -100,10 +100,10 @@ local function update_objs()
 end
 
 local function draw_objs()
-  for i=1,#objs do
-   local o=objs[i]
-   o:draw()
-  end
+ for i=1,#objs do
+  local o=objs[i]
+  o:draw()
+ end
 end
 
 local function cleanup_objs()
@@ -168,11 +168,11 @@ local function update_thing_circ(o)
 end
 
 local function update_thing_spr(o)
- local spr=o.spr+.25
- if spr>=73 then
-  spr=71
+ local spri=o.spri+.25
+ if spri>=73 then
+  spri=71
  end
- o.spr=spr
+ o.spri=spri
  update_thing(o)
 end
 
@@ -188,7 +188,7 @@ local function add_thing()
   add_obj_spr({
    x=rnd(128),
    y=128,
-   spr=71+rnd(1),
+   spri=71+rnd(1),
    update=update_thing_spr
   })
  end
