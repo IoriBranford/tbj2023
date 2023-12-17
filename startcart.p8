@@ -1,46 +1,42 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
--- about & utility
--- toy box jam start cart
--- by that tom hall & friends
--- sprites/sfx/code: that tom hall
--- sprites/sfx: lafolie
--- platforming anims: toby hefflin
--- music: gruber
--- additional code: see functions
--- if you did a function that is
--- uncredited, let me know!
--------------------------------
--- this contains a set of
--- creative assets to play
--- with. everyone has the same
--- set of "toys"... what will
--- you make of 'em?
--------------------------------
--- resources:
---
--- random useful sprites
---  (just go look or see asset list!)
--- random useful sfx
--- -00-21:sfx
--- -22-59:songs
--- -60-63:sfx
+-- data
+local anis={
+ hero={24,25,t=30},
+ snek={104,105,t=30},
+ boom={67,68,69,70,t=6},
+ pter={182,183,184,183,t=6},
 
--- songs: by gruber
--- 00 happy land
--- 06 chill
--- 12 scary dungeon
--- 18 fight
--- 21 evil
--- 23 defeat
--- 24 celebrate
--- 25 puzzle
--- 29 sand
+ ninidle={128,129,t=15},
+ ninprejump=130,
+ ninjump=131,
+ nindie={132,133,134,t=12},
+ ninswim={135,136,137,136,t=6},
+ ninrun={144,145,146,147,t=6},
+ ninroll={148,149,151,t=6},
+ nincrawl={150,151,t=12},
+ ninduck=152,
+ ninfroze=153,
+ ninclimb={160,161,{160,fx=true},t=6},
+ ninwall=162,
+ ninfall={163,164,t=3},
+ ninfire={165,166,165,t=6},
+ ninzip={167,168,t=3},
+ ninswing={176,177,t=6},
+ ninattack={t=6,
+  {178,palt=0b1100100001100000,pal={[5]=13}},
+  {178,palt=0b1000110001100000,pal={[1]=13}},
+  {178,palt=0b1000110001000000,pal={[1]=13}},
+  {178,palt=0b1000110000100000,pal={[1]=13}},
+  {178,palt=0b1000010001100000,pal={[1]=13}},
+ },
+ ninposs={179,180,181,t=6},
+}
 
--- 33 read or wait my dude by that tom hall
--- (not on gruber level, but useful)
--------------------------------
+
+-->8
+--utility
 
 local function nop() end
 
@@ -124,8 +120,6 @@ local function clear_objs()
   objs[i]=nil
  end
 end
--->8
---tab2
 -->8
 --tab3
 -->8
