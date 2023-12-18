@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
--- data
+-- assets
 local anis={
  hero={24,25,t=30},
  snek={104,105,t=30},
@@ -18,18 +18,18 @@ local anis={
  nincrawl={150,151,t=12},
  ninduck=152,
  ninfroze=153,
- ninclimb={160,161,{160,fx=true},t=6},
+ ninclimb={160,161,{i=160,fx=true},161,t=6},
  ninwall=162,
  ninfall={163,164,t=3},
  ninfire={165,166,165,t=6},
  ninzip={167,168,t=3},
  ninswing={176,177,t=6},
  ninattack={t=6,
-  {178,palt=0b1100100001100000,pal={[5]=13}},
-  {178,palt=0b1000110001100000,pal={[1]=13}},
-  {178,palt=0b1000110001000000,pal={[1]=13}},
-  {178,palt=0b1000110000100000,pal={[1]=13}},
-  {178,palt=0b1000010001100000,pal={[1]=13}},
+  {i=178,palt=0b1100100001100000,pal={[5]=13}},
+  {i=178,palt=0b1000110001100000,pal={[1]=13}},
+  {i=178,palt=0b1000110001000000,pal={[1]=13}},
+  {i=178,palt=0b1000110000100000,pal={[1]=13}},
+  {i=178,palt=0b1000010001100000,pal={[1]=13}},
  },
  ninposs={179,180,181,t=6},
 }
