@@ -60,6 +60,8 @@ end
 local objs={}
 
 local function draw_obj_circ(o)
+ local circ=o.fill and circfill
+  or circ
  circ(o.x,o.y,o.rad,o.clr)
 end
  
