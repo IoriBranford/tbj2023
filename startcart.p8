@@ -40,6 +40,10 @@ local anis={
 
 local function nop() end
 
+local function xor(a,b)
+  return a and not b or b and not a
+end
+
 local function cleanup(a, cond)
  for i=#a,1,-1 do
   local o=a[i]
@@ -83,7 +87,7 @@ end
 local function set_obj_frm(o,fi)
  fi=fi or 1
  local ani=o.ani
- local spri,ftz
+ local spri,ft
  local typ=type(ani)
  if typ=="number" then
   spri=ani
@@ -205,51 +209,29 @@ function _init()
  t=0
 end
 
-local function update_thing(o)
+local function update_ninja(o)
  o.y=o.y-1
  if o.y<0 then
   kill_obj(o)
  end
+ update_obj_ani(o)
 end
 
-local function update_thing_circ(o)
- o.clr=(o.clr+1)%16
- update_thing(o)
-end
-
-local function update_thing_spr(o)
- local spri=o.spri+.25
- if spri>=73 then
-  spri=71
- end
- o.spri=spri
- update_thing(o)
-end
-
-local function add_thing()
- if t%2==0 then
-  add_obj_circ({
-   x=rnd(128),
-   y=128,
-   rad=4,
-   update=update_thing_circ
-  })
- else
+local function add_ninja()
   add_obj_spr({
    x=rnd(128),
    y=128,
-   spri=71+rnd(1),
-   update=update_thing_spr
+   ani=rnd()<.5 and "ninrun" or "ninjump",
+   update=update_ninja
   })
- end
 end
 
 function _update60()
   t=t+1
   update_objs()
   cleanup_dead_objs()
-  if t%60>(t-1)%60 then
-   add_thing()
+  if t%15==0 then
+   add_ninja()
   end
 end
 
