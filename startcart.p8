@@ -175,7 +175,7 @@ local function obj_dead(o)
 end
 
 local function kill_obj(o)
- o.age=-1
+ o.age=-0x8000
 end
 
 local function update_objs()
@@ -253,7 +253,7 @@ local function add_ninja()
 end
 
 local function update_attack(o)
- if o.age>30 then
+ if o.age>=30 then
   kill_obj(o)
  end
  update_obj_ani(o)
