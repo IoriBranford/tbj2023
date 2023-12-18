@@ -64,9 +64,15 @@ local function draw_obj_circ(o)
 end
  
 local function draw_obj_spr(o)
+ local paltbits=o.palt
+ local palswaps=o.pal
+ if paltbits then palt(paltbits) end
+ if palswaps then pal(palswaps) end
  spr(o.spri,o.x,o.y,o.w,o.h,
   xor(o.flpx,o.frmflpx),
   xor(o.flpy,o.frmflpy))
+ if paltbits then palt() end
+ if palswaps then pal() end
 end
 
 local function add_obj(o)
@@ -90,6 +96,7 @@ local function set_obj_frm(o,fi)
  local ani=o.ani
  local spri,ft
  local flpx,flpy
+ local palt,pal
  local typ=type(ani)
  if typ=="number" then
   spri=ani
@@ -101,15 +108,22 @@ local function set_obj_frm(o,fi)
    ft=ani.t
    flpx=ani.flpx
    flpy=ani.flpy
+   palt=ani.palt
+   pal=ani.pal
   elseif typ=="table" then
    spri=f.i
    ft=f.t or ani.t
    flpx=xor(f.flpx,ani.flpx)
    flpy=xor(f.flpy,ani.flpy)
+   palt=f.palt or ani.palt
+   pal=f.pal or ani.pal
   else
    spri=ani.i
+   ft=ani.t
    flpx=ani.flpx
    flpy=ani.flpy
+   palt=ani.palt
+   pal=ani.pal
   end
  end
  o.spri=spri or 1
@@ -117,6 +131,8 @@ local function set_obj_frm(o,fi)
  o.ft=ft or 1
  o.frmflpx=flpx
  o.frmflpy=flpy
+ o.palt=palt
+ o.pal=pal
 end
 
 local function start_obj_ani(o,ani,fi)
