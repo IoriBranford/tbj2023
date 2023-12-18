@@ -80,12 +80,64 @@ local function add_obj_circ(o)
  o.draw=draw_obj_circ
 end
 
+local function set_obj_frm(o,fi)
+ fi=fi or 1
+ local ani=o.ani
+ local spri,ftz
+ local typ=type(ani)
+ if typ=="number" then
+  spri=ani
+ elseif typ=="table" then
+  local f=ani[fi]
+  typ=type(f)
+  if typ=="number" then
+   spri=f
+   ft=ani.t
+  elseif typ=="table" then
+   spri=f.i
+   ft=f.t or ani.t
+  else
+   spri=ani.i
+  end
+ end
+ o.spri=spri or 1
+ o.fi=fi
+ o.ft=ft or 1
+end
+
+local function start_obj_ani(o,ani,fi)
+ if type(ani)=="string" then
+  ani=anis[ani]
+ end
+ o.ani=ani
+ set_obj_frm(o,fi)
+end
+
+local function update_obj_ani(o)
+  local ani=o.ani
+  local n=type(ani)=="table" and #ani or 1
+  if n<2 then
+   return
+  end
+  local ft=o.ft-1
+  if ft==0 then
+   local fi=o.fi
+   set_obj_frm(o,fi==n and 1 or fi+1)
+  else
+   o.ft=ft
+  end
+end
+
 local function add_obj_spr(o)
  add_obj(o)
- o.spri=o.spri or 1
  o.w=o.w or 1
  o.h=o.h or 1
- o.draw=draw_obj_spr
+ o.draw=draw_obj_spr 
+ if o.ani then
+  start_obj_ani(o,o.ani,o.fi)
+ end
+ o.spri=o.spri or 1
+ return o
 end
 
 local function obj_dead(o)
