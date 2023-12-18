@@ -105,28 +105,22 @@ local function set_obj_frm(o,fi)
  elseif typ=="table" then
   local f=ani[fi]
   typ=type(f)
-  if typ=="number" then
-   spri=f
-   ft=ani.t
-   flpx=ani.flpx
-   flpy=ani.flpy
-   palt=ani.palt
-   pal=ani.pal
-  elseif typ=="table" then
+  if typ=="table" then
    spri=f.i
-   ft=f.t or ani.t
+   ft=f.t
    flpx=xor(f.flpx,ani.flpx)
    flpy=xor(f.flpy,ani.flpy)
-   palt=f.palt or ani.palt
-   pal=f.pal or ani.pal
+   palt=f.palt
+   pal=f.pal
   else
-   spri=ani.i
-   ft=ani.t
+   spri=typ=="number" and f
    flpx=ani.flpx
    flpy=ani.flpy
-   palt=ani.palt
-   pal=ani.pal
   end
+  spri=spri or ani.i
+  ft=ft or ani.t
+  palt=palt or ani.palt
+  pal=pal or ani.pal
  end
  o.spri=spri or 1
  o.fi=fi
