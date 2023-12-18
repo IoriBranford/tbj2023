@@ -18,7 +18,7 @@ local anis={
  nincrawl={150,151,t=12},
  ninduck=152,
  ninfroze=153,
- ninclimb={160,161,{i=160,fx=true},161,t=6},
+ ninclimb={160,161,{i=160,flpx=true},161,t=6},
  ninwall=162,
  ninfall={163,164,t=3},
  ninfire={165,166,165,t=6},
@@ -65,7 +65,8 @@ end
  
 local function draw_obj_spr(o)
  spr(o.spri,o.x,o.y,o.w,o.h,
-  o.fx,o.fy)
+  xor(o.flpx,o.frmflpx),
+  xor(o.flpy,o.frmflpy))
 end
 
 local function add_obj(o)
@@ -88,6 +89,7 @@ local function set_obj_frm(o,fi)
  fi=fi or 1
  local ani=o.ani
  local spri,ft
+ local flpx,flpy
  local typ=type(ani)
  if typ=="number" then
   spri=ani
@@ -97,16 +99,24 @@ local function set_obj_frm(o,fi)
   if typ=="number" then
    spri=f
    ft=ani.t
+   flpx=ani.flpx
+   flpy=ani.flpy
   elseif typ=="table" then
    spri=f.i
    ft=f.t or ani.t
+   flpx=xor(f.flpx,ani.flpx)
+   flpy=xor(f.flpy,ani.flpy)
   else
    spri=ani.i
+   flpx=ani.flpx
+   flpy=ani.flpy
   end
  end
  o.spri=spri or 1
  o.fi=fi
  o.ft=ft or 1
+ o.frmflpx=flpx
+ o.frmflpy=flpy
 end
 
 local function start_obj_ani(o,ani,fi)
@@ -221,7 +231,7 @@ local function add_ninja()
   add_obj_spr({
    x=rnd(128),
    y=128,
-   ani=rnd()<.5 and "ninrun" or "ninjump",
+   ani="ninclimb",
    update=update_ninja
   })
 end
