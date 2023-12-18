@@ -2,38 +2,77 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 -- assets
-local anis={
+local sprs={
  hero={24,25,t=30},
  snek={104,105,t=30},
  boom={67,68,69,70,t=6},
  pter={182,183,184,183,t=6},
 
- ninidle={128,129,t=15},
- ninprejump=130,
- ninjump=131,
- nindie={132,133,134,t=12},
- ninswim={135,136,137,136,t=6},
- ninrun={144,145,146,147,t=6},
- ninroll={148,149,151,t=6},
- nincrawl={150,151,t=12},
- ninduck=152,
- ninfroze=153,
- ninclimb={160,161,{i=160,flpx=true},161,t=6},
- ninwall=162,
- ninfall={163,164,t=3},
- ninfire={165,166,165,t=6},
- ninzip={167,168,t=3},
- ninswing={176,177,t=6},
- ninattack={t=6,
-  {i=178,palt=0b1100100001100000,pal={[5]=13}},
-  {i=178,palt=0b1000110001100000,pal={[1]=13}},
-  {i=178,palt=0b1000110001000000,pal={[1]=13}},
-  {i=178,palt=0b1000110000100000,pal={[1]=13}},
-  {i=178,palt=0b1000010001100000,pal={[1]=13}},
+ nin={
+  _base=128,
+  idle={0,1,t=15},
+  prejump=2,
+  jump=3,
+  die={4,5,6,t=12},
+  swim={7,8,9,8,t=6},
+  run={16,17,18,17,t=6},
+  roll={20,21,
+   {i=20,flpx=true,flpy=true},
+   {i=21,flpx=true,flpy=true},
+   t=6
+  },
+  crawl={22,23,t=12},
+  duck=23,
+  froze=24,
+  climb={32,33,
+   {i=32,flpx=true},
+   {i=33,flpx=true},
+   t=6
+  },
+  wall=34,
+  fall={35,36,t=3},
+  fire={37,38,37,t=6},
+  zip={39,40,t=3},
+  swing={48,49,t=6},
+  attack={t=6,
+   {i=50,palt=0b1100100001100000,pal={[5]=13}},
+   {i=50,palt=0b1000110001100000,pal={[1]=13}},
+   {i=50,palt=0b1000110001000000,pal={[1]=13}},
+   {i=50,palt=0b1000110000100000,pal={[1]=13}},
+   {i=50,palt=0b1000010001100000,pal={[1]=13}},
+  },
+  poss={51,52,53,t=6},
  },
- ninposs={179,180,181,t=6},
 }
 
+local function apply_spr_base(spr,base)
+ local typ=type(spr)
+ if typ=="number" then
+  return spr+base
+ end
+
+ if typ=="table" then
+  local i=spr.i
+  if i then
+   spr.i=i+base
+  end
+
+  for i=1,#spr do
+   spr[i]=apply_spr_base(spr[i],base)
+  end
+ end
+ return spr
+end
+
+for name,spr in pairs(sprs) do
+ local base=type(spr)=="table"
+  and spr._base
+ if base then
+  for name,subspr in pairs(spr) do
+   spr[name]=apply_spr_base(subspr,base)
+  end
+ end
+end
 
 -->8
 --utility
@@ -132,9 +171,6 @@ local function set_obj_frm(o,fi)
 end
 
 local function start_obj_ani(o,ani,fi)
- if type(ani)=="string" then
-  ani=anis[ani]
- end
  o.ani=ani
  set_obj_frm(o,fi)
 end
@@ -243,7 +279,7 @@ local function add_ninja()
  add_obj_spr({
   x=rnd(128),
   y=128,
-  ani="ninclimb",
+  ani=sprs.nin.climb,
   update=update_ninja
  })
 end
@@ -259,7 +295,7 @@ local function add_attack()
  add_obj_spr({
   x=rnd(128),
   y=rnd(128),
-  ani="ninattack",
+  ani=sprs.nin.attack,
   update=update_attack
  })
 end
