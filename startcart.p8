@@ -103,8 +103,36 @@ local function draw_obj_circ(o)
   or circ
  circ(o.x,o.y,o.rad,o.clr)
 end
+
+local function draw_obj_sspr(o)
+  local sx,sy=o.sx,o.sy
+  local sw,sh=o.sw,o.sh
+  local i=o.spri
+  if i and not (sx and sy) then
+   sx=(i&0xF)<<3
+   sy=(i&~0xF)>>1
+  end
+  sw=sw or ((o.w or 1)<<3)
+  sh=sh or ((o.h or 1)<<3)
+  local paltbits=o.palt
+  local palswaps=o.pal
+  if paltbits then palt(paltbits) end
+  if palswaps then pal(palswaps) end
+  sspr(sx or 0,sy or 0,
+   sw,sh,
+   o.x,o.y,
+   o.dw or sw,o.dh or sh,
+   xor(o.flpx,o.frmflpx),
+   xor(o.flpy,o.frmflpy))
+  if paltbits then palt() end
+  if palswaps then pal() end
+end
  
 local function draw_obj_spr(o)
+ if o.dw or o.dh then
+  draw_obj_sspr(o)
+  return
+ end
  local paltbits=o.palt
  local palswaps=o.pal
  if paltbits then palt(paltbits) end
