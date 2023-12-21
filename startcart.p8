@@ -99,6 +99,12 @@ local function draw_obj_spr(o)
   xor(o.flpy,o.frmflpy))
 end
 
+local function draw_obj_map(o)
+ palt(o.palt)
+ pal(o.pal)
+ map(o.celx,o.cely,o.x,o.y,o.celw,o.celh,o.layer)
+end
+
 local function add_obj(o)
  add(objs,o)
  o.age=0
@@ -187,6 +193,15 @@ local function add_obj_spr(o)
  end
  o.spri=o.spri or 1
  return o
+end
+
+local function add_obj_map(o)
+ add_obj(o)
+ o.draw=draw_obj_map
+ o.celx=o.celx or 0
+ o.cely=o.cely or 0
+ o.celw=o.celw or 1
+ o.celh=o.celh or 1
 end
 
 local function obj_dead(o)
