@@ -197,19 +197,23 @@ local function start_obj_ani(o,ani,fi)
  set_obj_frm(o,fi)
 end
 
-local function update_obj_ani(o)
-  local ani=o.ani
-  local n=type(ani)=="table" and #ani or 1
-  if n<2 then
-   return
-  end
-  local ft=o.ft-1
-  if ft==0 then
-   local fi=o.fi
-   set_obj_frm(o,fi==n and 1 or fi+1)
-  else
-   o.ft=ft
-  end
+local function update_obj_ani(o,ani)
+ if ani and ani~=o.ani then
+  start_obj_ani(o,ani)
+  return
+ end
+ ani=o.ani
+ local n=type(ani)=="table" and #ani or 1
+ if n<2 then
+  return
+ end
+ local ft=o.ft-1
+ if ft==0 then
+  local fi=o.fi
+  set_obj_frm(o,fi==n and 1 or fi+1)
+ else
+  o.ft=ft
+ end
 end
 
 local function add_obj_spr(o)
