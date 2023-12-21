@@ -283,29 +283,49 @@ end
 -->8
 --tabD
 -->8
---tabE
--->8
---main
+--ninja
 
-local t
-
-function _init()
- t=0
-end
+local ninaccel=.25
+local nintopspd=2
 
 local function update_ninja(o)
- o.y=o.y-1
- if o.y<0 then
-  kill_obj(o)
+ local inx=
+ (btn(⬅️) and -1 or 0) +
+ (btn(➡️) and 1 or 0)
+ local iny=
+ (btn(⬆️) and -1 or 0) +
+ (btn(⬇️) and 1 or 0)
+ 
+ local vx=o.vx
+ if inx==0 then
+  if vx<0 then
+   vx=min(vx+ninaccel,0)
+  elseif vx>0 then
+   vx=max(0,vx-ninaccel)
+  end
+ else
+  vx=mid(-nintopspd,vx+inx*ninaccel,nintopspd)
+  o.flpx=inx<0
  end
- update_obj_ani(o)
+ o.vx=vx
+ o.x=o.x+vx
+ 
+ local ani
+ if vx~=0 then
+  ani=sprs.nin.run
+ else
+  ani=sprs.nin.idle
+ end
+ update_obj_ani(o,ani)
 end
 
 local function add_ninja()
  add_obj_spr({
-  x=rnd(128),
-  y=128,
-  ani=sprs.nin.climb,
+  x=64,
+  y=64,
+  vx=0,
+  vy=0,
+  ani=sprs.nin.idle,
   update=update_ninja
  })
 end
@@ -325,13 +345,20 @@ local function add_attack()
   update=update_attack
  })
 end
+-->8
+--main
+local t
+
+function _init()
+ t=0
+ add_ninja()
+end
 
 function _update60()
   t=t+1
   update_objs()
   cleanup_dead_objs()
   if t%30==0 then
-   add_ninja()
   elseif t%30==15 then
    add_attack()
   end
