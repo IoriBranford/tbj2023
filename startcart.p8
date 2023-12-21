@@ -1,49 +1,8 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
--- assets
-local sprs={
- hero={24,25,t=30},
- snek={104,105,t=30},
- boom={67,68,69,70,t=6},
- pter={182,183,184,183,t=6},
-
- nin={
-  _base=128,
-  idle={0,1,t=15},
-  prejump=2,
-  jump=3,
-  die={4,5,6,t=12},
-  swim={7,8,9,8,t=6},
-  run={16,17,18,17,t=6},
-  roll={20,21,
-   {i=20,flpx=true,flpy=true},
-   {i=21,flpx=true,flpy=true},
-   t=6
-  },
-  crawl={22,23,t=12},
-  duck=23,
-  froze=24,
-  climb={32,33,
-   {i=32,flpx=true},
-   {i=33,flpx=true},
-   t=6
-  },
-  wall=34,
-  fall={35,36,t=3},
-  fire={37,38,37,t=6},
-  zip={39,40,t=3},
-  swing={48,49,t=6},
-  attack={t=6,
-   {i=50,palt=0b1100100001100000,pal={[5]=13}},
-   {i=50,palt=0b1000110001100000,pal={[1]=13}},
-   {i=50,palt=0b1000110001000000,pal={[1]=13}},
-   {i=50,palt=0b1000110000100000,pal={[1]=13}},
-   {i=50,palt=0b1000010001100000,pal={[1]=13}},
-  },
-  poss={51,52,53,t=6},
- },
-}
+-- asset handling
+local sprs={}
 
 local function apply_spr_base(spr,base)
  local typ=type(spr)
@@ -64,12 +23,14 @@ local function apply_spr_base(spr,base)
  return spr
 end
 
-for name,spr in pairs(sprs) do
- local base=type(spr)=="table"
-  and spr._base
- if base then
-  for name,subspr in pairs(spr) do
-   spr[name]=apply_spr_base(subspr,base)
+local function apply_sprs_bases(sprs)
+ for name,spr in pairs(sprs) do
+  local base=type(spr)=="table"
+   and spr._base
+  if base then
+   for name,subspr in pairs(spr) do
+    spr[name]=apply_spr_base(subspr,base)
+   end
   end
  end
 end
@@ -261,27 +222,50 @@ local function clear_objs()
  end
 end
 -->8
---tab3
--->8
---tab4
--->8
---tab5
--->8
---tab6
--->8
---tab7
--->8
---tab8
--->8
---tab9
--->8
---tabA
--->8
---tabB
--->8
---tabC
--->8
---tabD
+-- game assets
+sprs={
+ hero={24,25,t=30},
+ snek={104,105,t=30},
+ boom={67,68,69,70,t=6},
+ pter={182,183,184,183,t=6},
+
+ nin={
+  _base=128,
+  idle={0,1,t=15},
+  prejump=2,
+  jump=3,
+  die={4,5,6,t=12},
+  swim={7,8,9,8,t=6},
+  run={16,17,18,17,t=6},
+  roll={20,21,
+   {i=20,flpx=true,flpy=true},
+   {i=21,flpx=true,flpy=true},
+   t=6
+  },
+  crawl={22,23,t=12},
+  duck=23,
+  froze=24,
+  climb={32,33,
+   {i=32,flpx=true},
+   {i=33,flpx=true},
+   t=6
+  },
+  wall=34,
+  fall={35,36,t=3},
+  fire={37,38,37,t=6},
+  zip={39,40,t=3},
+  swing={48,49,t=6},
+  attack={t=6,
+   {i=50,palt=0b1100100001100000,pal={[5]=13}},
+   {i=50,palt=0b1000110001100000,pal={[1]=13}},
+   {i=50,palt=0b1000110001000000,pal={[1]=13}},
+   {i=50,palt=0b1000110000100000,pal={[1]=13}},
+   {i=50,palt=0b1000010001100000,pal={[1]=13}},
+  },
+  poss={51,52,53,t=6},
+ },
+}
+apply_sprs_bases(sprs)
 -->8
 --ninja
 
