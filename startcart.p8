@@ -327,6 +327,14 @@ local function update_nin_phys(o)
   vx=mid(-nintopspd,vx+inx*ninaccel,nintopspd)
   o.flpx=inx<0
  end
+
+ if vx<0 then
+  local wall=0
+  vx=max(vx,wall-o.x)
+ elseif vx>0 then
+  local wall=120
+  vx=min(vx,wall-o.x)
+ end
  o.vx=vx
  o.x=o.x+vx
 end
