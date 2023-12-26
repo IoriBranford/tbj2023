@@ -297,6 +297,16 @@ local rooms={ --<y,{celx,cely}>
  [-128]={0,0}
 }
 
+local function to_room_cell(x,y)
+ x,y=flr(x),flr(y)
+ local room=rooms[y&~0x7F]
+ if room then
+  return
+   room[1]+((x&0x7F)>>3),
+   room[2]+((y&0x7F)>>3)
+ end
+end
+
 local function add_rooms()
  for y,room in pairs(rooms) do
   add_obj_map({
