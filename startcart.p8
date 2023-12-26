@@ -375,22 +375,6 @@ local function add_ninja()
   update=update_ninja
  })
 end
-
-local function update_attack(o)
- if o.age>=30 then
-  kill_obj(o)
- end
- update_obj_ani(o)
-end
-
-local function add_attack()
- add_obj_spr({
-  x=rnd(128),
-  y=rnd(128),
-  ani=sprs.nin.attack,
-  update=update_attack
- })
-end
 -->8
 --main
 local t
@@ -405,10 +389,6 @@ function _update60()
   t=t+1
   update_objs()
   cleanup_dead_objs()
-  if t%30==0 then
-  elseif t%30==15 then
-   add_attack()
-  end
 end
 
 function _draw()
