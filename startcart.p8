@@ -335,7 +335,6 @@ local function update_nin_phys(o)
   end
  else
   vx=mid(-nintopspd,vx+inx*ninaccel,nintopspd)
-  o.flpx=inx<0
  end
 
  if vx<0 then
@@ -350,10 +349,11 @@ local function update_nin_phys(o)
 end
 
 local function update_nin_ani(o)
- local vx,vy=o.vx,o.vy
+ local inx,iny=dir_input()
  local ani
- if vx~=0 then
+ if inx~=0 then
   ani=sprs.nin.run
+  o.flpx=inx<0
  else
   ani=sprs.nin.idle
  end
