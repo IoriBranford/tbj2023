@@ -366,7 +366,7 @@ local function update_ninja(o)
 end
 
 local function add_ninja()
- add_obj_spr({
+ return add_obj_spr({
   x=64,
   y=64,
   vx=0,
@@ -378,11 +378,12 @@ end
 -->8
 --main
 local t
+local nin
 
 function _init()
  t=0
  add_rooms()
- add_ninja()
+ nin=add_ninja()
 end
 
 function _update60()
@@ -393,7 +394,9 @@ end
 
 function _draw()
  cls()
+ camera(0,nin.y-96)
  draw_objs()
+ camera()
 end
 __gfx__
 00012000606660666066606660666066606660666066606616666661feeeeee87bbbbbb30000004000000030000300000b0dd030777777674f9f4fff7999a999
