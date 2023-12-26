@@ -54,6 +54,14 @@ local function cleanup(a, cond)
  end
 end
 
+local function dir_input()
+ return
+  (btn(⬅️) and -1 or 0) +
+   (btn(➡️) and 1 or 0),
+  (btn(⬆️) and -1 or 0) +
+   (btn(⬇️) and 1 or 0)
+end
+
 -->8
 --object
 
@@ -306,14 +314,8 @@ end
 local ninaccel=.25
 local nintopspd=2
 
-local function update_ninja(o)
- local inx=
- (btn(⬅️) and -1 or 0) +
- (btn(➡️) and 1 or 0)
- local iny=
- (btn(⬆️) and -1 or 0) +
- (btn(⬇️) and 1 or 0)
- 
+local function update_nin_phys(o)
+ local inx,iny=dir_input()
  local vx=o.vx
  if inx==0 then
   if vx<0 then
@@ -327,7 +329,10 @@ local function update_ninja(o)
  end
  o.vx=vx
  o.x=o.x+vx
- 
+end
+
+local function update_nin_ani(o)
+ local vx,vy=o.vx,o.vy
  local ani
  if vx~=0 then
   ani=sprs.nin.run
@@ -335,6 +340,11 @@ local function update_ninja(o)
   ani=sprs.nin.idle
  end
  update_obj_ani(o,ani)
+end
+
+local function update_ninja(o)
+ update_nin_phys(o)
+ update_nin_ani(o)
 end
 
 local function add_ninja()
