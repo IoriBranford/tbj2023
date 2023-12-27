@@ -543,6 +543,7 @@ update_nin_air=function(o)
  if climbldr then
   o.x=climbldr
   o.vx=0
+  o.vy=min(0,o.vy)
   o.update=update_nin_climb
  elseif obj_ground(o) then
   o.update=update_nin_ground
