@@ -412,9 +412,12 @@ local function update_nin_phys(o)
  end
  vy=vy+ningrav
 
- vx,vy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
- o.vx,o.vy=vx,vy
- o.x,o.y=o.x+vx,o.y+vy
+ local collvx,collvy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
+ o.x,o.y=o.x+collvx,o.y+collvy
+ if vy~=collvy then
+  collvy=0
+ end
+ o.vx,o.vy=collvx,collvy
 end
 
 local function update_nin_ani(o)
