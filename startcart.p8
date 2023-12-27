@@ -331,6 +331,17 @@ local function room_cell_bounds(x,y,vx,vy)
  return bndx,bndy
 end
 
+local function obj_ground(o)
+ local w,h=o.w<<3,o.h<<3
+ local x,y=o.x,o.y+h
+ for x=x,x+w-1,w-1 do
+  local _,bnd=room_cell_bounds(x,y,0,1)
+  if bnd then
+   return bnd
+  end
+ end
+end
+
 local function add_rooms()
  for y,room in pairs(rooms) do
   add_obj_map({
