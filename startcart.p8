@@ -299,6 +299,7 @@ local rooms={ --<y,{celx,cely}>
  [256]={16,0},
  [384]={16,16},
 }
+local worldbtm=512
 
 local function room_cell(x,y)
  x,y=flr(x),flr(y)
@@ -346,34 +347,60 @@ end
 
 local ninaccel=.25
 local nintopspd=2
+local ningrav=.125
 
 local function collide_vel(x,y,w,h,vx,vy)
- local bndx,edgex,cmpx
- if vx<0 then
-  bndx=0
-  edgex=x
-  cmpx=max
- elseif vx>0 then
-  bndx=128
-  edgex=x+w
-  cmpx=min
+ local bnd,edge,cmp
+
+ if vy<0 then
+  bnd=0
+  edge=y
+  cmp=max
+ elseif vy>0 then
+  bnd=worldbtm
+  edge=y+h
+  cmp=min
+ else
+  bnd=nil
  end
 
- if bndx then
-  for y=y,y+h-1,h-1 do
-   local cbndx=room_cell_bounds(edgex,y,vx,vy)
-   if cbndx then
-    bndx=cmpx(bndx,cbndx)
+ if bnd then
+  for x=x,x+w-1,w-1 do
+   local _,cbnd=room_cell_bounds(x,edge,vx,vy)
+   if cbnd then
+    bnd=cmp(bnd,cbnd)
    end
   end
-  vx=cmpx(vx,bndx-edgex)
+  vy=cmp(vy,bnd-edge)
+ end
+
+ if vx<0 then
+  bnd=0
+  edge=x
+  cmp=max
+ elseif vx>0 then
+  bnd=128
+  edge=x+w
+  cmp=min
+ else
+  bnd=nil
+ end
+
+ if bnd then
+  for y=y,y+h-1,h-1 do
+   local cbnd=room_cell_bounds(edge,y,vx,vy)
+   if cbnd then
+    bnd=cmp(bnd,cbnd)
+   end
+  end
+  vx=cmp(vx,bnd-edge)
  end
  return vx,vy
 end
 
 local function update_nin_phys(o)
  local inx,iny=dir_input()
- local vx=o.vx
+ local vx,vy=o.vx,o.vy
  if inx==0 then
   if vx<0 then
    vx=min(vx+ninaccel,0)
@@ -383,20 +410,25 @@ local function update_nin_phys(o)
  else
   vx=mid(-nintopspd,vx+inx*ninaccel,nintopspd)
  end
+ vy=vy+ningrav
 
- vx=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,o.vy)
- o.vx=vx
- o.x=o.x+vx
+ vx,vy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
+ o.vx,o.vy=vx,vy
+ o.x,o.y=o.x+vx,o.y+vy
 end
 
 local function update_nin_ani(o)
  local inx,iny=dir_input()
  local ani
- if inx~=0 then
-  ani=sprs.nin.run
-  o.flpx=inx<0
+ if o.vy==0 then
+  if inx~=0 then
+   ani=sprs.nin.run
+   o.flpx=inx<0
+  else
+   ani=sprs.nin.idle
+  end
  else
-  ani=sprs.nin.idle
+  ani=sprs.nin.jump
  end
  update_obj_ani(o,ani)
 end
@@ -409,7 +441,7 @@ end
 local function add_ninja()
  return add_obj_spr({
   x=60,
-  y=444,
+  y=384,
   vx=0,
   vy=0,
   ani=sprs.nin.idle,
