@@ -432,18 +432,32 @@ local function nin_drop_y(o)
  o.y=o.y+vy
 end
 
-local function update_nin_ani(o)
- local inx,iny=dir_input()
+local function update_nin_flpx(o,dirx)
+ if dirx~=0 then
+  o.flpx=dirx<0
+ end
+end
+
+local function update_nin_air_ani(o)
+ update_nin_flpx(o,dir_input())
+ local vy=o.vy
  local ani
- if o.vy==0 then
-  if inx~=0 then
-   ani=sprs.nin.run
-   o.flpx=inx<0
-  else
-   ani=sprs.nin.idle
-  end
- else
+ if vy<0 then
   ani=sprs.nin.jump
+ else
+  ani=sprs.nin.zip
+ end
+ update_obj_ani(o,ani)
+end
+
+local function update_nin_ground_ani(o)
+ local inx=dir_input()
+ update_nin_flpx(o,inx)
+ local ani
+ if inx~=0 then
+  ani=sprs.nin.run
+ else
+  ani=sprs.nin.idle
  end
  update_obj_ani(o,ani)
 end
@@ -456,7 +470,7 @@ local function update_nin_air(o)
  if obj_ground(o) then
   o.update=update_nin_ground
  end
- update_nin_ani(o)
+ update_nin_air_ani(o)
 end
 
 update_nin_ground=function(o)
@@ -468,7 +482,7 @@ update_nin_ground=function(o)
  else
   o.update=update_nin_air
  end
- update_nin_ani(o)
+ update_nin_ground_ani(o)
 end
 
 local function add_ninja()
