@@ -356,7 +356,7 @@ end
 -->8
 --ninja
 
-local ninaccel=.25
+local ninrunaccel=.25
 local nintoprunspd=2
 local nintopfallspd=4
 local ningrav=.125
@@ -410,26 +410,34 @@ local function collide_vel(x,y,w,h,vx,vy)
  return vx,vy
 end
 
-local function update_nin_phys(o)
- local inx,iny=dir_input()
+local function nin_move_x(o)
+ local inx=
+  (btn(⬅️) and -1 or 0) +
+  (btn(➡️) and 1 or 0)
  local vx,vy=o.vx,o.vy
  if inx==0 then
   if vx<0 then
-   vx=min(vx+ninaccel,0)
+   vx=min(vx+ninrunaccel,0)
   elseif vx>0 then
-   vx=max(0,vx-ninaccel)
+   vx=max(0,vx-ninrunaccel)
   end
  else
-  vx=mid(-nintoprunspd,vx+inx*ninaccel,nintoprunspd)
+  vx=mid(-nintoprunspd,vx+inx*ninrunaccel,nintoprunspd)
  end
- vy=min(vy+ningrav,nintopfallspd)
+ vx=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
+ o.vx=vx
+ o.x=o.x+vx
+end
 
- local collvx,collvy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
- o.x,o.y=o.x+collvx,o.y+collvy
+local function nin_drop_y(o)
+ local vx,vy=o.vx,o.vy
+ vy=min(vy+ningrav,nintopfallspd)
+ local _,collvy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
+ o.y=o.y+collvy
  if vy~=collvy then
   collvy=0
  end
- o.vx,o.vy=collvx,collvy
+ o.vy=collvy
 end
 
 local function update_nin_ani(o)
@@ -448,8 +456,26 @@ local function update_nin_ani(o)
  update_obj_ani(o,ani)
 end
 
-local function update_ninja(o)
- update_nin_phys(o)
+local update_nin_ground
+
+local function update_nin_air(o)
+ nin_drop_y(o)
+ nin_move_x(o)
+ if obj_ground(o) then
+  o.update=update_nin_ground
+ end
+ update_nin_ani(o)
+end
+
+update_nin_ground=function(o)
+ nin_move_x(o)
+ local grnd=obj_ground(o)
+ if grnd then
+  o.vy=grnd-o.y-(o.h<<3)
+  o.y=o.y+o.vy
+ else
+  o.update=update_nin_air
+ end
  update_nin_ani(o)
 end
 
@@ -460,7 +486,7 @@ local function add_ninja()
   vx=0,
   vy=0,
   ani=sprs.nin.idle,
-  update=update_ninja
+  update=update_nin_ground
  })
 end
 -->8
@@ -486,8 +512,8 @@ function _draw()
  draw_objs()
  -- camera()
  local c,r=room_cell(nin.x,nin.y)
- print(c,nin.x,nin.y-16)
- print(r,nin.x,nin.y-8)
+ print(nin.vx,nin.x,nin.y-16)
+ print(nin.vy,nin.x,nin.y-8)
 end
 __gfx__
 00012000606660666066606660666066606660666066606616666661feeeeee87bbbbbb30000004000000030000300000b0dd030777777674f9f4fff7999a999
