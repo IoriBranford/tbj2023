@@ -346,7 +346,8 @@ end
 --ninja
 
 local ninaccel=.25
-local nintopspd=2
+local nintoprunspd=2
+local nintopfallspd=4
 local ningrav=.125
 
 local function collide_vel(x,y,w,h,vx,vy)
@@ -408,9 +409,9 @@ local function update_nin_phys(o)
    vx=max(0,vx-ninaccel)
   end
  else
-  vx=mid(-nintopspd,vx+inx*ninaccel,nintopspd)
+  vx=mid(-nintoprunspd,vx+inx*ninaccel,nintoprunspd)
  end
- vy=vy+ningrav
+ vy=min(vy+ningrav,nintopfallspd)
 
  local collvx,collvy=collide_vel(o.x,o.y,o.w<<3,o.h<<3,vx,vy)
  o.x,o.y=o.x+collvx,o.y+collvy
