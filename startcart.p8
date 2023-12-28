@@ -538,10 +538,8 @@ local function update_nin_climb_ani(o)
 end
 
 local function update_nin_climb(o)
- local inx,iny=dir_input()
- if inx~=0 and iny==0 then
-  o.vx=nintoprunspd*inx
-  o.update=update_nin_air
+ if nin_try_jump(o) then
+  o.vx=nintoprunspd*dir_input_x()
  else
   local collvy=nin_climb_y(o)
   if collvy<0 then
