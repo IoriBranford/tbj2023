@@ -596,6 +596,7 @@ local t
 local nin
 
 function _init()
+ poke(0X5F5C, 255)
  t=0
  add_rooms()
  nin=add_ninja()
