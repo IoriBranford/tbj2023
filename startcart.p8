@@ -384,6 +384,7 @@ local nintopfallspd=4
 local ningrav=1/8
 local ninclimbaccel=.5
 local nintopclimbspd=1.5
+local ninjumpvely=-2
 
 local function nin_coll_vy(x,y,w,h,vy)
  local bnd,edge,cmp
@@ -492,7 +493,7 @@ local function update_nin_flpx(o,dirx)
 end
 
 local function update_nin_air_ani(o)
- update_nin_flpx(o,dir_input())
+ update_nin_flpx(o,dir_input_x())
  local vy=o.vy
  local ani
  if vy<0 then
@@ -504,7 +505,7 @@ local function update_nin_air_ani(o)
 end
 
 local function update_nin_ground_ani(o)
- local inx=dir_input()
+ local inx=dir_input_x()
  update_nin_flpx(o,inx)
  local ani
  if inx~=0 then
@@ -517,8 +518,16 @@ end
 
 local update_nin_ground,update_nin_air
 
+local function nin_try_jump(o,holdok)
+ if holdok and btn(🅾️) or btnp(🅾️) then
+  o.vy=ninjumpvely
+  o.update=update_nin_air
+  return true
+ end
+end
+
 local function update_nin_climb_ani(o)
- local _,iny=dir_input()
+ local iny=dir_input_y()
  local ani
  if iny~=0 then
   ani=sprs.nin.climb
@@ -544,30 +553,38 @@ local function update_nin_climb(o)
  update_nin_climb_ani(o)
 end
 
-update_nin_air=function(o)
- nin_drop_y(o)
- nin_move_x(o)
- local _,iny=dir_input()
+local function nin_try_climb(o)
+ local iny=dir_input_y()
  local climbldr=iny~=0 and obj_ladder(o)
  if climbldr then
+  o.jumpagain=nil
   o.x=climbldr
   o.vx=0
   o.vy=min(0,o.vy)
   o.update=update_nin_climb
+  return true
+ end
+end
+
+update_nin_air=function(o)
+ nin_drop_y(o)
+ nin_move_x(o)
+ o.jumpagain=o.jumpagain or btnp(🅾️)
+ if nin_try_climb(o) then
  elseif obj_ground(o) then
-  o.update=update_nin_ground
+  if o.jumpagain and nin_try_jump(o,true) then
+  else
+   o.update=update_nin_ground
+  end
+  o.jumpagain=nil
  end
  update_nin_air_ani(o)
 end
 
 update_nin_ground=function(o)
  nin_move_x(o)
- local _,iny=dir_input()
- local climbldr=iny~=0 and obj_ladder(o)
- if climbldr then
-  o.x=climbldr
-  o.vx=0
-  o.update=update_nin_climb
+ if nin_try_climb(o) then
+ elseif nin_try_jump(o) then
  else
   local grnd=obj_ground(o)
   if grnd then
