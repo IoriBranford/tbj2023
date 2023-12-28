@@ -54,12 +54,21 @@ local function cleanup(a, cond)
  end
 end
 
-local function dir_input()
+local function dir_input_x()
  return
   (btn(⬅️) and -1 or 0) +
-   (btn(➡️) and 1 or 0),
+  (btn(➡️) and 1 or 0)
+end
+
+local function dir_input_y()
+ return
   (btn(⬆️) and -1 or 0) +
-   (btn(⬇️) and 1 or 0)
+  (btn(⬇️) and 1 or 0)
+end
+
+local function dir_input()
+ return dir_input_x(),
+  dir_input_y()
 end
 
 -->8
