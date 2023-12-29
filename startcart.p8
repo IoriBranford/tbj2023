@@ -212,6 +212,16 @@ local function add_obj_spr(o)
  return o
 end
 
+local function obj_frm_ending(o)
+ return (o.ft or 1)<=1
+end
+
+local function obj_ani_ending(o)
+ local ani=o.ani
+ local n=type(ani)=="table" and #ani or 1
+ return n<=(o.fi or 1) and obj_frm_ending(o)
+end
+
 local function add_obj_map(o)
  add_obj(o)
  o.draw=draw_obj_map
