@@ -407,7 +407,7 @@ end
 --ninja
 
 local ninrunaccel=.25
-local nintoprunspd=2
+local nintoprunspd=1.5
 local nintopfallspd=4
 local ningrav=1/8
 local ninclimbaccel=.5
@@ -626,13 +626,74 @@ end
 local function add_ninja()
  return add_obj_spr({
   x=60,
-  y=384,
+  y=448,
   vx=0,
   vy=0,
   ani=sprs.nin.idle,
   update=update_nin_ground
  })
 end
+-->8
+--enemy
+
+local enemyrunspd=2
+
+local start_enemy_run
+
+local function update_enemy_shot(o)
+ if obj_ani_ending(o) then
+  start_enemy_run(o)
+  return
+ end
+ update_obj_ani(o,sprs.en.throw)
+end
+
+local function start_enemy_shot(o)
+ o.vx=0
+ o.vy=0
+ o.readytofire=nil
+ o.update=update_enemy_shot
+end
+
+local function update_enemy_run(o)
+ if o.readytofire and
+ abs(nin.x+4-(o.x+8))<2 then
+  start_enemy_shot(o)
+  return
+ end
+ local x=o.x+o.vx
+ if x>=112 then
+  o.x=112
+  o.vx=-o.vx
+  o.readytofire=true
+ elseif x<0 then
+  o.x=0
+  o.vx=-o.vx
+  o.readytofire=true
+ else
+  o.x=x
+ end
+ o.flpx=o.vx<0
+ update_obj_ani(o,sprs.en.run)
+end
+
+start_enemy_run=function(o)
+ o.vx=o.flpx and -enemyrunspd
+  or enemyrunspd
+ o.vy=0
+ o.readytofire=nil
+ o.update=update_enemy_run
+end
+
+local function add_enemy()
+ local o=add_obj_spr{
+  x=56,y=384,
+  vx=0,vy=0,
+  w=2,h=2,
+ }
+ start_enemy_run(o)
+end
+
 -->8
 --main
 local t
@@ -643,6 +704,7 @@ function _init()
  t=0
  add_rooms()
  nin=add_ninja()
+ en=add_enemy()
 end
 
 function _update60()
