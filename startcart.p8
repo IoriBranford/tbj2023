@@ -304,6 +304,15 @@ sprs={
   },
   poss={51,52,53,t=6},
  },
+ boss={
+  _base=192,
+  idle={0,2,t=10},
+  run={4,6,8,10,t=6},
+  jump=12,
+  drop=14,
+  prethrow=34,
+  throw={36,38,40,t=6}
+ }
 }
 apply_sprs_bases(sprs)
 -->8
