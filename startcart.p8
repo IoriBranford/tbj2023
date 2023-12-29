@@ -314,7 +314,7 @@ sprs={
   },
   poss={51,52,53,t=6},
  },
- enemy={
+ en={
   _base=192,
   idle={0,2,t=10},
   run={4,6,8,10,t=6},
@@ -327,6 +327,8 @@ sprs={
 apply_sprs_bases(sprs)
 -->8
 --game world
+local nin,en
+
 local solidflag=0
 local ladderflag=1
 
@@ -634,7 +636,6 @@ end
 -->8
 --main
 local t
-local nin
 
 function _init()
  poke(0X5F5C, 255)
