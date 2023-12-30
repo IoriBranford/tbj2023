@@ -521,10 +521,20 @@ local nintopclimbspd=1.5
 local ninjumpvely=-2
 local ninjumpinvely=-2.5
 local ninblownoutvely=-4
+local nininvul=180
 
 local update_nin_ground,
  update_nin_air,
  start_nin_jumpin
+
+local function update_nin_invul(o)
+ if o.invul then
+  o.invul=o.invul-1
+  if o.invul<=0 then
+   o.invul=nil
+  end
+ end
+end
 
 local function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
@@ -554,6 +564,10 @@ local function nin_start_dying(o)
 end
 
 local function nin_hit_objs(o)
+ if o.invul then
+  return
+ end
+
  for bomb in all(bombs) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
@@ -732,6 +746,7 @@ local function update_nin_climb(o)
  if o.dying then
   return
  end
+ update_nin_invul(o)
  if nin_try_jump(o) then
   o.vx=nintoprunspd*dir_input_x()
  else
@@ -764,6 +779,7 @@ update_nin_air=function(o)
  if o.dying then
   return
  end
+ update_nin_invul(o)
  nin_drop_y(o)
  nin_move_x(o)
  o.jumpagain=o.jumpagain or btnp(🅾️)
@@ -784,6 +800,7 @@ update_nin_ground=function(o)
  if o.dying then
   return
  end
+ update_nin_invul(o)
  nin_move_x(o)
  if nin_try_climb(o) then
  elseif nin_try_jump(o) then
@@ -817,15 +834,23 @@ start_nin_jumpin=function(o)
  o.y=cam.y+128
  o.vx=0
  o.vy=ninjumpinvely
+ o.invul=nininvul
  o.update=update_nin_jumpin
 end
 
+local function draw_ninja(o)
+ if (o.invul or 0)%2==0 then
+  draw_obj_spr(o)
+ end
+end
+
 local function add_ninja()
- local o={
+ local o=add_obj_spr {
   life=10
  }
+ o.draw=draw_ninja
  start_nin_jumpin(o)
- return add_obj_spr(o)
+ return o
 end
 
 local function draw_nin_hud(o)
