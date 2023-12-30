@@ -2,7 +2,6 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 -- asset handling
-local sprs={}
 
 local function apply_spr_base(spr,base)
  local typ=type(spr)
@@ -277,7 +276,7 @@ local snds={
  endmus=16
 }
 
-sprs={
+local sprs={
  hero={24,25,t=30},
  snek={104,105,t=30},
  boom={67,68,69,70,t=6},
