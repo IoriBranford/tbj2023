@@ -326,7 +326,7 @@ sprs={
   jump=12,
   drop=14,
   prethrow=34,
-  throw={36,38,40,t=6}
+  throw={i=32,t=30}
  }
 }
 apply_sprs_bases(sprs)
@@ -408,6 +408,37 @@ local function add_rooms()
   })
  end
 end
+-->8
+--bombs
+
+local function update_bomb_normal(o)
+ o.y=o.y+o.vy
+ if o.y>nin.y+128 then
+  kill_obj(o)
+ end
+ update_obj_ani(o)
+end
+
+local bombtmpls={
+ normal={
+  vx=0,vy=1.5,
+  ani=sprs.bomb.normal,
+  update=update_bomb_normal,
+ }
+}
+
+local function add_bomb(o,tmpl)
+ if type(tmpl)=="string" then
+  tmpl=bombtmpls[tmpl]
+ end
+ tmpl=type(tmpl)=="table" and tmpl
+  or bombtmpls.normal
+ for k,v in pairs(tmpl) do
+  o[k]=v
+ end
+ return add_obj_spr(o)
+end
+
 -->8
 --ninja
 
@@ -658,11 +689,16 @@ local function start_enemy_shot(o)
  o.vy=0
  o.readytofire=nil
  o.update=update_enemy_shot
+ add_bomb({
+  x=o.x+(o.w<<1),
+  y=o.y+(o.h<<1)
+ },o.bombtmpl)
 end
 
 local function update_enemy_run(o)
- if o.readytofire and
- abs(nin.x+4-(o.x+8))<2 then
+ if o.readytofire
+ and abs(nin.x+(nin.w<<2)-(o.x+(o.w<<2)))<2
+ then
   start_enemy_shot(o)
   return
  end
@@ -695,6 +731,7 @@ local function add_enemy()
   x=56,y=384,
   vx=0,vy=0,
   w=2,h=2,
+  bombtmpl=bombtmpls.normal
  }
  start_enemy_run(o)
 end
