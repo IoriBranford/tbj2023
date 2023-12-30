@@ -80,6 +80,21 @@ end
 
 local objs={}
 
+local function draw_obj_text(o)
+ local text=o.text
+ local typ=type(text)
+ if typ=="table" then
+  local y=o.y
+  local lineh=o.lineh or 8
+  for i=1,#text do
+   print(text[i],o.x,y,o.clr)
+   y=y+8
+  end
+ elseif typ=="string" then
+  print(text,o.x,o.y,o.clr)
+ end
+end
+
 local function draw_obj_circ(o)
  local circ=o.fill and circfill
   or circ
@@ -140,6 +155,13 @@ local function add_obj_circ(o)
  o.rad=o.rad or 1
  o.clr=o.clr or 1
  o.draw=draw_obj_circ
+end
+
+local function add_obj_text(o)
+ add_obj(o)
+ o.clr=o.clr or 7
+ o.lineh=o.lineh or 8
+ o.draw=draw_obj_text
 end
 
 local function set_obj_frm(o,fi)
