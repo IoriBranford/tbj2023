@@ -460,6 +460,7 @@ local ningrav=1/8
 local ninclimbaccel=.5
 local nintopclimbspd=1.5
 local ninjumpvely=-2
+local ninjumpinvely=-2.5
 
 local function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
@@ -678,15 +679,32 @@ update_nin_ground=function(o)
  cam_on_nin(o)
 end
 
+local function update_nin_jumpin(o)
+ local vy=o.vy
+ vy=min(vy+ningrav,nintopfallspd)
+ o.vy=vy
+ o.y=o.y+vy
+ update_nin_air_ani(o)
+ if o.vy>0 and o.y>=o.desty then
+  o.y=o.desty
+  o.update=update_nin_ground
+  return
+ end
+end
+
+local function start_nin_jumpin(o)
+ o.x=60
+ o.y=cam.y+128
+ o.desty=o.y-16
+ o.vx=0
+ o.vy=ninjumpinvely
+ o.update=update_nin_jumpin
+end
+
 local function add_ninja()
- return add_obj_spr({
-  x=60,
-  y=448,
-  vx=0,
-  vy=0,
-  ani=sprs.nin.idle,
-  update=update_nin_ground
- })
+ local o={}
+ start_nin_jumpin(o)
+ return add_obj_spr(o)
 end
 -->8
 --enemy
