@@ -191,11 +191,17 @@ local function update_obj_ani(o,ani)
   return
  end
  ani=o.ani
- local n=type(ani)=="table" and #ani or 1
+ local typ=type(ani)
+ local n=typ=="table" and #ani or 1
  local ft=o.ft-1
  if ft==0 then
   local fi=o.fi
-  set_obj_frm(o,fi==n and 1 or fi+1)
+  if fi>=n then
+   fi=typ=="table" and ani.loop or 1
+  else
+   fi=fi+1
+  end
+  set_obj_frm(o,fi)
  else
   o.ft=ft
  end
@@ -308,6 +314,7 @@ local sprs={
   idle={0,1,t=15},
   prejump=2,
   jump=3,
+  blownup={t=6,loop=3,4,5,35,36},
   die={4,5,6,t=12},
   swim={7,8,9,8,t=6},
   run={16,17,18,17,t=6},
@@ -354,6 +361,7 @@ apply_sprs_bases(sprs)
 --game world
 local nin,en
 local bombs={}
+local expls={}
 
 local solidflag=0
 local ladderflag=1
@@ -465,11 +473,11 @@ local function bomb_explode(o)
   ani=sprs.expl.br,
   update=update_expl
  }
- add_obj_spr {
+ add(expls, add_obj_spr {
   x=cx-4,y=cy-4,
   ani=sprs.expl.ctr,
   update=update_expl
- }
+ })
  kill_obj(o)
 end
 
@@ -512,13 +520,40 @@ local ninclimbaccel=.5
 local nintopclimbspd=1.5
 local ninjumpvely=-2
 local ninjumpinvely=-2.5
+local ninblownoutvely=-4
+
+local update_nin_ground,
+ update_nin_air,
+ start_nin_jumpin
 
 local function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
  cam.y=min(cam.y+vy,worldbtm-128)
 end
 
-local function nin_hit_bomb(o)
+local function update_nin_death(o)
+ update_obj_ani(o,sprs.nin.blownup)
+ o.vy=o.vy+ningrav
+ o.y=o.y+o.vy
+ if o.y>cam.y+128 then
+  if o.life>0 then
+   o.life=o.life-1
+   o.dying=false
+   start_nin_jumpin(o)
+  else
+   --game over
+  end
+ end
+end
+
+local function nin_start_dying(o)
+ o.vx=0
+ o.vy=ninblownoutvely
+ o.dying=true
+ o.update=update_nin_death
+end
+
+local function nin_hit_objs(o)
  for bomb in all(bombs) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
@@ -527,6 +562,17 @@ local function nin_hit_bomb(o)
    0,0)
   then
    bomb_explode(bomb)
+  end
+ end
+
+ for expl in all(expls) do
+  if aabbs(o.x,o.y,
+   o.w<<3,o.h<<3,
+   expl.x+(expl.w<<2),
+   expl.y+(expl.h<<2),
+   0,0)
+  then
+   nin_start_dying(o)
    break
   end
  end
@@ -662,8 +708,6 @@ local function update_nin_ground_ani(o)
  update_obj_ani(o,ani)
 end
 
-local update_nin_ground,update_nin_air
-
 local function nin_try_jump(o,holdok)
  if holdok and btn(🅾️) or btnp(🅾️) then
   o.vy=ninjumpvely
@@ -684,7 +728,8 @@ local function update_nin_climb_ani(o)
 end
 
 local function update_nin_climb(o)
- if nin_hit_bomb(o) then
+ nin_hit_objs(o)
+ if o.dying then
  end
  if nin_try_jump(o) then
   o.vx=nintoprunspd*dir_input_x()
@@ -714,7 +759,8 @@ local function nin_try_climb(o)
 end
 
 update_nin_air=function(o)
- if nin_hit_bomb(o) then
+ nin_hit_objs(o)
+ if o.dying then
  end
  nin_drop_y(o)
  nin_move_x(o)
@@ -732,7 +778,8 @@ update_nin_air=function(o)
 end
 
 update_nin_ground=function(o)
- if nin_hit_bomb(o) then
+ nin_hit_objs(o)
+ if o.dying then
  end
  nin_move_x(o)
  if nin_try_climb(o) then
@@ -762,7 +809,7 @@ local function update_nin_jumpin(o)
  end
 end
 
-local function start_nin_jumpin(o)
+start_nin_jumpin=function(o)
  o.x=60
  o.y=cam.y+128
  o.vx=0
@@ -873,6 +920,7 @@ function _update60()
   update_objs()
   cleanup_dead_objs()
   cleanup(bombs,obj_dead)
+  cleanup(expls,obj_dead)
 end
 
 function _draw()
