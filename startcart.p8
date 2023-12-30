@@ -689,6 +689,7 @@ local function start_enemy_shot(o)
  o.vy=0
  o.readytofire=nil
  o.update=update_enemy_shot
+ update_obj_ani(o,sprs.en.throw)
  add_bomb({
   x=o.x+(o.w<<1),
   y=o.y+(o.h<<1)
