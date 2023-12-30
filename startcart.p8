@@ -261,6 +261,14 @@ local function clear_objs()
  end
 end
 -->8
+-- camera
+local cam={
+ x=0,y=0
+}
+
+local camtopspd=4
+
+-->8
 -- game assets
 local snds={
  gamemus=0,
@@ -344,6 +352,9 @@ local rooms={ --<y,{celx,cely}>
  [384]={16,16},
 }
 local worldbtm=512
+
+cam.x=0
+cam.y=384
 
 local function room_cell(x,y)
  x,y=flr(x),flr(y)
@@ -449,6 +460,11 @@ local ningrav=1/8
 local ninclimbaccel=.5
 local nintopclimbspd=1.5
 local ninjumpvely=-2
+
+local function cam_on_nin(o)
+ local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
+ cam.y=min(cam.y+vy,worldbtm-128)
+end
 
 local function nin_coll_vy(x,y,w,h,vy)
  local bnd,edge,cmp
@@ -613,6 +629,7 @@ local function update_nin_climb(o)
   end
  end
  update_nin_climb_ani(o)
+ cam_on_nin(o)
 end
 
 local function nin_try_climb(o)
@@ -641,6 +658,7 @@ update_nin_air=function(o)
   o.jumpagain=nil
  end
  update_nin_air_ani(o)
+ cam_on_nin(o)
 end
 
 update_nin_ground=function(o)
@@ -657,6 +675,7 @@ update_nin_ground=function(o)
   end
  end
  update_nin_ground_ani(o)
+ cam_on_nin(o)
 end
 
 local function add_ninja()
@@ -758,7 +777,7 @@ end
 
 function _draw()
  cls()
- camera(0,nin.y-96)
+ camera(cam.x,cam.y)
  draw_objs()
  -- camera()
  local c,r=room_cell(nin.x,nin.y)
