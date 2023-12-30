@@ -287,6 +287,13 @@ local sprs={
  boom={67,68,69,70,t=6},
  pter={182,183,184,183,t=6},
  heart=64,
+ expl={
+  _base=67,
+  tl={t=6,0,1,2,3},
+  tr={t=6,flpx=true,0,1,2,3},
+  bl={t=6,flpy=true,0,1,2,3},
+  br={t=6,flpx=true,flpy=true,0,1,2,3}
+ },
  bomb={
   _base=16,
   normal={
