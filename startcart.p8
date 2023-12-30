@@ -282,7 +282,7 @@ sprs={
  snek={104,105,t=30},
  boom={67,68,69,70,t=6},
  pter={182,183,184,183,t=6},
-
+ heart=64,
  bomb={
   _base=16,
   normal={
@@ -700,9 +700,20 @@ local function start_nin_jumpin(o)
 end
 
 local function add_ninja()
- local o={}
+ local o={
+  life=10
+ }
  start_nin_jumpin(o)
  return add_obj_spr(o)
+end
+
+local function draw_nin_hud(o)
+ local y=121
+ local x=0
+ for i=1,o.life do
+  spr(sprs.heart,x,y)
+  x=x+8
+ end
 end
 -->8
 --enemy
@@ -795,10 +806,11 @@ function _draw()
  cls()
  camera(cam.x,cam.y)
  draw_objs()
- -- camera()
  local c,r=room_cell(nin.x,nin.y)
  print(nin.vx,nin.x,nin.y-16)
  print(nin.vy,nin.x,nin.y-8)
+ camera()
+ draw_nin_hud(nin)
 end
 __gfx__
 000120000000000000000000000000000000000000000000000000000aaaaa000aaaaa00aa000aa00aaaaaa0099099000b0dd030777777674f9f4fff7999a999
