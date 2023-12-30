@@ -70,6 +70,11 @@ local function dir_input()
   dir_input_y()
 end
 
+local function aabbs(x,y,w,h,a,b,m,n)
+ return x+w>a and x<a+m
+  and y+h>b and y<b+n
+end
+
 -->8
 --object
 
