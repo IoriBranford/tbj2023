@@ -685,9 +685,8 @@ local function update_nin_jumpin(o)
  o.vy=vy
  o.y=o.y+vy
  update_nin_air_ani(o)
- if o.vy>0 and o.y>=o.desty then
-  o.y=o.desty
-  o.update=update_nin_ground
+ if o.vy>0 then
+  o.update=update_nin_air
   return
  end
 end
@@ -695,7 +694,6 @@ end
 local function start_nin_jumpin(o)
  o.x=60
  o.y=cam.y+128
- o.desty=o.y-16
  o.vx=0
  o.vy=ninjumpinvely
  o.update=update_nin_jumpin
