@@ -434,6 +434,39 @@ end
 -->8
 --bombs
 
+local function update_expl(o)
+ if obj_ani_ending(o) then
+  kill_obj(o)
+ end
+ update_obj_ani(o)
+end
+
+local function bomb_explode(o)
+ local cx=o.x+(o.w<<2)
+ local cy=o.y+(o.h<<2)
+ add_obj_spr {
+  x=cx-8,y=cy-8,
+  ani=sprs.expl.tl,
+  update=update_expl
+ }
+ add_obj_spr {
+  x=cx,y=cy-8,
+  ani=sprs.expl.tr,
+  update=update_expl
+ }
+ add_obj_spr {
+  x=cx-8,y=cy,
+  ani=sprs.expl.bl,
+  update=update_expl
+ }
+ add_obj_spr {
+  x=cx,y=cy,
+  ani=sprs.expl.br,
+  update=update_expl
+ }
+ kill_obj(o)
+end
+
 local function update_bomb_normal(o)
  o.y=o.y+o.vy
  if o.y>nin.y+128 then
@@ -477,6 +510,19 @@ local ninjumpinvely=-2.5
 local function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
  cam.y=min(cam.y+vy,worldbtm-128)
+end
+
+local function nin_hit_bomb(o)
+ for bomb in all(bombs) do
+  if aabbs(o.x,o.y,
+   o.w<<3,o.h<<3,
+   bomb.x,bomb.y,
+   bomb.w<<3,bomb.h<<3)
+  then
+   bomb_explode(bomb)
+   break
+  end
+ end
 end
 
 local function nin_coll_vy(x,y,w,h,vy)
@@ -631,6 +677,8 @@ local function update_nin_climb_ani(o)
 end
 
 local function update_nin_climb(o)
+ if nin_hit_bomb(o) then
+ end
  if nin_try_jump(o) then
   o.vx=nintoprunspd*dir_input_x()
  else
@@ -659,6 +707,8 @@ local function nin_try_climb(o)
 end
 
 update_nin_air=function(o)
+ if nin_hit_bomb(o) then
+ end
  nin_drop_y(o)
  nin_move_x(o)
  o.jumpagain=o.jumpagain or btnp(🅾️)
@@ -675,6 +725,8 @@ update_nin_air=function(o)
 end
 
 update_nin_ground=function(o)
+ if nin_hit_bomb(o) then
+ end
  nin_move_x(o)
  if nin_try_climb(o) then
  elseif nin_try_jump(o) then
