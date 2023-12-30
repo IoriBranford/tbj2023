@@ -396,8 +396,13 @@ local rooms={ --<y,{celx,cely}>
 }
 local worldbtm=512
 
-cam.x=0
-cam.y=384
+local function clear_game_objs()
+ clear_objs()
+ nin=nil
+ en=nil
+ bombs={}
+ expls={}
+end
 
 local function room_cell(x,y)
  x,y=flr(x),flr(y)
