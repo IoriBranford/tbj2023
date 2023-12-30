@@ -538,7 +538,7 @@ local function update_nin_death(o)
  if o.y>cam.y+128 then
   if o.life>0 then
    o.life=o.life-1
-   o.dying=false
+   o.dying=nil
    start_nin_jumpin(o)
   else
    --game over
@@ -730,6 +730,7 @@ end
 local function update_nin_climb(o)
  nin_hit_objs(o)
  if o.dying then
+  return
  end
  if nin_try_jump(o) then
   o.vx=nintoprunspd*dir_input_x()
@@ -761,6 +762,7 @@ end
 update_nin_air=function(o)
  nin_hit_objs(o)
  if o.dying then
+  return
  end
  nin_drop_y(o)
  nin_move_x(o)
@@ -780,6 +782,7 @@ end
 update_nin_ground=function(o)
  nin_hit_objs(o)
  if o.dying then
+  return
  end
  nin_move_x(o)
  if nin_try_climb(o) then
