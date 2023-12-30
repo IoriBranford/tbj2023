@@ -352,6 +352,7 @@ apply_sprs_bases(sprs)
 -->8
 --game world
 local nin,en
+local bombs={}
 
 local solidflag=0
 local ladderflag=1
@@ -747,10 +748,11 @@ local function start_enemy_shot(o)
  o.readytofire=nil
  o.update=update_enemy_shot
  update_obj_ani(o,sprs.en.throw)
- add_bomb({
+ local bomb=add_bomb({
   x=o.x+(o.w<<1),
   y=o.y+(o.h<<1)
  },o.bombtmpl)
+ add(bombs,bomb)
 end
 
 local function update_enemy_run(o)
@@ -811,6 +813,7 @@ function _update60()
   t=t+1
   update_objs()
   cleanup_dead_objs()
+  cleanup(bombs,obj_dead)
 end
 
 function _draw()
