@@ -522,8 +522,9 @@ local function nin_hit_bomb(o)
  for bomb in all(bombs) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
-   bomb.x,bomb.y,
-   bomb.w<<3,bomb.h<<3)
+   bomb.x+(bomb.w<<2),
+   bomb.y+(bomb.h<<2),
+   0,0)
   then
    bomb_explode(bomb)
    break
