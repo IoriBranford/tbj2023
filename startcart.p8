@@ -188,9 +188,6 @@ local function update_obj_ani(o,ani)
  end
  ani=o.ani
  local n=type(ani)=="table" and #ani or 1
- if n<2 then
-  return
- end
  local ft=o.ft-1
  if ft==0 then
   local fi=o.fi
