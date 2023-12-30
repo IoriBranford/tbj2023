@@ -381,9 +381,7 @@ local sprs={
 apply_sprs_bases(sprs)
 -->8
 --game world
-local nin,en
-local bombs={}
-local expls={}
+local nin,en,bombs,expls
 
 local solidflag=0
 local ladderflag=1
@@ -539,6 +537,8 @@ end
 -->8
 --ninja
 
+local ninstartlife=5
+local ninmaxstartlife=9
 local ninrunaccel=.25
 local nintoprunspd=1.5
 local nintopfallspd=4
@@ -873,17 +873,17 @@ end
 
 local function add_ninja()
  local o=add_obj_spr {
-  life=10
+  life=ninstartlife
  }
  o.draw=draw_ninja
  start_nin_jumpin(o)
  return o
 end
 
-local function draw_nin_hud(o)
+local function draw_life(life)
  local y=121
  local x=0
- for i=1,o.life do
+ for i=1,life do
   spr(sprs.heart,x,y)
   x=x+8
  end
@@ -956,29 +956,17 @@ local function add_enemy()
  }
  start_enemy_run(o)
 end
-
 -->8
---main
-local t
+--game phases
 
-function _init()
- poke(0X5F5C, 255)
- music(snds.gamemus)
- t=0
- add_rooms()
- nin=add_ninja()
- en=add_enemy()
+local function update_game()
+ update_objs()
+ cleanup_dead_objs()
+ cleanup(bombs,obj_dead)
+ cleanup(expls,obj_dead)
 end
 
-function _update60()
-  t=t+1
-  update_objs()
-  cleanup_dead_objs()
-  cleanup(bombs,obj_dead)
-  cleanup(expls,obj_dead)
-end
-
-function _draw()
+local function draw_game()
  cls()
  camera(cam.x,cam.y)
  draw_objs()
@@ -986,8 +974,62 @@ function _draw()
  print(nin.vx,nin.x,nin.y-16)
  print(nin.vy,nin.x,nin.y-8)
  camera()
- draw_nin_hud(nin)
+ draw_life(nin.life)
 end
+
+local function start_game()
+ cam.x=0
+ cam.y=384
+ clear_game_objs()
+ add_rooms()
+ nin=add_ninja()
+ en=add_enemy()
+ poke(0X5F5C, 255)
+ music(snds.gamemus)
+ _update60=update_game
+ _draw=draw_game
+end
+
+local function update_title()
+ if btnp(🅾️) or btnp(❎) then
+  start_game()
+ elseif btnp(⬅️) then
+  ninstartlife=max(1,ninstartlife-1)
+ elseif btnp(➡️) then
+  ninstartlife=min(ninmaxstartlife,
+   ninstartlife+1)
+ end
+end
+
+local function draw_title()
+ cls()
+ draw_objs()
+ draw_life(ninstartlife)
+end
+
+local function start_title()
+ poke(0X5F5C, 0)
+ clear_game_objs()
+ camera()
+ add_obj_text {
+  text={
+   "   rise   ",
+   "  to the  ",
+   " commander",
+   "  of the  ",
+   "wolf triad!",
+   "",
+   "⬅️/➡️ set starting life 1-9",
+   "🅾️ start game"
+  }
+ }
+ music(snds.titlemus)
+ _update60=update_title
+ _draw=draw_title
+end
+
+_init=start_title
+
 __gfx__
 000120000000000000000000000000000000000000000000000000000aaaaa000aaaaa00aa000aa00aaaaaa0099099000b0dd030777777674f9f4fff7999a999
 07d12570000000000000000000000000000000000000000000000000a99999a0a99999a099a0a990a99999909aa9aa90d3000b0d76777777fffff9f49999979a
