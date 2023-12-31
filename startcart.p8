@@ -472,15 +472,11 @@ local fusecolors={8,14,7}
 
 local function draw_bomb(o)
  local secs=ceil((o.fuse or -1)/60)
- if 0<secs and secs<=#fusecolors then
-  local clr=fusecolors[secs]
+ local clr=fusecolors[secs]
+ if clr then
   print(secs,o.x+2,o.y-8,clr)
  end
  draw_obj_spr(o)
-end
-
-local function start_bomb_fuse(o)
- o.fuse=abs(o.fuse)
 end
 
 local function update_expl(o)
@@ -523,10 +519,33 @@ end
 
 local function update_bomb_normal(o)
  o.y=o.y+o.vy
- if o.y>ninja.y+128 then
+ if o.y>cam.y+128
+ or o.x+(o.w<<3)<cam.x then
   kill_obj(o)
  end
  update_obj_ani(o)
+end
+
+local function update_bomb_fuse(o)
+ o.fuse=o.fuse-1
+ if o.fuse<=0 then
+  bomb_explode(o)
+ end
+ update_obj_ani(o)
+end
+
+local function start_bomb_fuse(o)
+ o.fuse=abs(o.fuse)
+ o.updateonthrow=o.update
+ o.update=update_bomb_fuse
+end
+
+local function start_bomb_thrown(o)
+ o.update=o.updateonthrow
+ o.updateonthrow=nil
+ o.fuse=-1
+ o.target=enemy
+ o.flpy=true
 end
 
 local bombtmpls={
@@ -567,6 +586,7 @@ local nintopclimbspd=1.5
 local ninjumpvely=-2
 local ninjumpinvely=-2.5
 local ninblownoutvely=-4
+local ninthrowbombvely=-4
 local nininvul=180
 
 local update_nin_ground,
@@ -585,11 +605,10 @@ end
 local function nin_update_held_bomb(o)
  local b=o.bomb
  if b then
-  b.x,b.y=o.x,o.y-4
-  b.fuse=b.fuse-1
-  if b.fuse<=0 then
+  if obj_dead(b) then
    o.bomb=nil
-   bomb_explode(b)
+  else
+   b.x,b.y=o.x,o.y-4
   end
  end
 end
@@ -804,8 +823,16 @@ local function nin_find_catch_bomb(o)
 end
 
 local function nin_try_catch_bomb(o)
- if btnp(⬆️) and not o.bomb then
-  local bomb=nin_find_catch_bomb(o)
+ if not btnp(⬆️) then
+  return
+ end
+ local bomb=o.bomb
+ if bomb then
+  o.bomb=nil
+  start_bomb_thrown(bomb)
+  bomb.vy=ninthrowbombvely
+ else
+  bomb=nin_find_catch_bomb(o)
   if bomb then
    bomb.vx=0
    bomb.vy=0
