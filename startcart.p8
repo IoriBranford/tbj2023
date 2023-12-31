@@ -468,6 +468,21 @@ end
 -->8
 --bombs
 
+local fusecolors={8,14,7}
+
+local function draw_bomb(o)
+ local secs=ceil((o.fuse or -1)/60)
+ if 0<secs and secs<=#fusecolors then
+  local clr=fusecolors[secs]
+  print(secs,o.x+2,o.y-8,clr)
+ end
+ draw_obj_spr(o)
+end
+
+local function start_bomb_fuse(o)
+ o.fuse=abs(o.fuse)
+end
+
 local function update_expl(o)
  if obj_ani_ending(o) then
   kill_obj(o)
@@ -516,6 +531,7 @@ end
 
 local bombtmpls={
  normal={
+  fuse=180,
   vx=0,vy=1.5,
   ani=sprs.bomb.normal,
   update=update_bomb_normal,
@@ -531,7 +547,10 @@ local function add_bomb(o,tmpl)
  for k,v in pairs(tmpl) do
   o[k]=v
  end
- return add_obj_spr(o)
+ add_obj_spr(o)
+ o.draw=draw_bomb
+ o.fuse=-o.fuse
+ return o
 end
 
 -->8
@@ -563,6 +582,18 @@ local function update_nin_invul(o)
  end
 end
 
+local function nin_update_held_bomb(o)
+ local b=o.bomb
+ if b then
+  b.x,b.y=o.x,o.y-4
+  b.fuse=b.fuse-1
+  if b.fuse<=0 then
+   o.bomb=nil
+   bomb_explode(b)
+  end
+ end
+end
+
 local function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
  cam.y=min(cam.y+vy,worldbtm-128)
@@ -588,6 +619,10 @@ local function nin_start_dying(o)
  o.vy=ninblownoutvely
  o.dying=true
  o.update=update_nin_death
+ if o.bomb then
+  bomb_explode(o.bomb)
+  o.bomb=nil
+ end
 end
 
 local function nin_hit_objs(o)
@@ -609,9 +644,8 @@ local function nin_hit_objs(o)
  for expl in all(expls) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
-   expl.x+(expl.w<<2),
-   expl.y+(expl.h<<2),
-   0,0)
+   expl.x,expl.y,
+   expl.w<<3,expl.h<<3)
   then
    nin_start_dying(o)
    break
@@ -757,6 +791,31 @@ local function nin_try_jump(o,holdok)
  end
 end
 
+local function nin_find_catch_bomb(o)
+ local x,y=o.x,o.y-4
+ for bomb in all(bombs) do
+  if aabbs(x,y,8,4,
+   bomb.x,bomb.y,
+   bomb.w<<3,bomb.h<<3)
+  then
+   return bomb
+  end
+ end
+end
+
+local function nin_try_catch_bomb(o)
+ if btnp(⬆️) and not o.bomb then
+  local bomb=nin_find_catch_bomb(o)
+  if bomb then
+   bomb.vx=0
+   bomb.vy=0
+   o.bomb=bomb
+   start_bomb_fuse(bomb)
+   return bomb
+  end
+ end
+end
+
 local function update_nin_climb_ani(o)
  local iny=dir_input_y()
  local ani
@@ -790,7 +849,9 @@ end
 
 local function nin_try_climb(o)
  local iny=dir_input_y()
- local climbldr=iny~=0 and obj_ladder(o)
+ local climbldr=iny~=0
+  and not o.bomb
+  and obj_ladder(o)
  if climbldr then
   o.jumpagain=nil
   o.x=climbldr
@@ -809,6 +870,7 @@ update_nin_air=function(o)
  update_nin_invul(o)
  nin_drop_y(o)
  nin_move_x(o)
+ nin_try_catch_bomb(o)
  o.jumpagain=o.jumpagain or btnp(🅾️)
  if nin_try_climb(o) then
  elseif obj_ground(o) then
@@ -818,6 +880,7 @@ update_nin_air=function(o)
   end
   o.jumpagain=nil
  end
+ nin_update_held_bomb(o)
  update_nin_air_ani(o)
  cam_on_nin(o)
 end
@@ -829,6 +892,7 @@ update_nin_ground=function(o)
  end
  update_nin_invul(o)
  nin_move_x(o)
+ nin_try_catch_bomb(o)
  if nin_try_climb(o) then
  elseif nin_try_jump(o) then
  else
@@ -840,6 +904,7 @@ update_nin_ground=function(o)
    o.update=update_nin_air
   end
  end
+ nin_update_held_bomb(o)
  update_nin_ground_ani(o)
  cam_on_nin(o)
 end
