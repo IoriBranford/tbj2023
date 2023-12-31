@@ -331,7 +331,7 @@ local sprs={
    t=6
   }
  },
- nin={
+ ninja={
   _base=128,
   idle={0,1,t=15},
   prejump=2,
@@ -368,7 +368,7 @@ local sprs={
   },
   poss={51,52,53,t=6},
  },
- en={
+ enemy={
   _base=192,
   idle={0,2,t=10},
   run={4,6,8,10,t=6},
@@ -381,7 +381,7 @@ local sprs={
 apply_sprs_bases(sprs)
 -->8
 --game world
-local nin,en,bombs,expls
+local ninja,enemy,enbombs,expls
 
 local solidflag=0
 local ladderflag=1
@@ -396,9 +396,9 @@ local worldbtm=512
 
 local function clear_game_objs()
  clear_objs()
- nin=nil
- en=nil
- bombs={}
+ ninja=nil
+ enemy=nil
+ enbombs={}
  expls={}
 end
 
@@ -523,7 +523,7 @@ end
 
 local function update_bomb_normal(o)
  o.y=o.y+o.vy
- if o.y>nin.y+128 then
+ if o.y>ninja.y+128 then
   kill_obj(o)
  end
  update_obj_ani(o)
@@ -600,7 +600,7 @@ local function cam_on_nin(o)
 end
 
 local function update_nin_death(o)
- update_obj_ani(o,sprs.nin.blownup)
+ update_obj_ani(o,sprs.ninja.blownup)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
  if o.y>cam.y+128 then
@@ -630,7 +630,7 @@ local function nin_hit_objs(o)
   return
  end
 
- for bomb in all(bombs) do
+ for bomb in all(enbombs) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
    bomb.x+(bomb.w<<2),
@@ -764,9 +764,9 @@ local function update_nin_air_ani(o)
  local vy=o.vy
  local ani
  if vy<0 then
-  ani=sprs.nin.jump
+  ani=sprs.ninja.jump
  else
-  ani=sprs.nin.zip
+  ani=sprs.ninja.zip
  end
  update_obj_ani(o,ani)
 end
@@ -776,9 +776,9 @@ local function update_nin_ground_ani(o)
  update_nin_flpx(o,inx)
  local ani
  if inx~=0 then
-  ani=sprs.nin.run
+  ani=sprs.ninja.run
  else
-  ani=sprs.nin.idle
+  ani=sprs.ninja.idle
  end
  update_obj_ani(o,ani)
 end
@@ -793,7 +793,7 @@ end
 
 local function nin_find_catch_bomb(o)
  local x,y=o.x,o.y-4
- for bomb in all(bombs) do
+ for bomb in all(enbombs) do
   if aabbs(x,y,8,4,
    bomb.x,bomb.y,
    bomb.w<<3,bomb.h<<3)
@@ -820,9 +820,9 @@ local function update_nin_climb_ani(o)
  local iny=dir_input_y()
  local ani
  if iny~=0 then
-  ani=sprs.nin.climb
+  ani=sprs.ninja.climb
  else
-  ani=sprs.nin.hang
+  ani=sprs.ninja.hang
  end
  update_obj_ani(o,ani)
 end
@@ -965,7 +965,7 @@ local function update_enemy_shot(o)
   start_enemy_run(o)
   return
  end
- update_obj_ani(o,sprs.en.throw)
+ update_obj_ani(o,sprs.enemy.throw)
 end
 
 local function start_enemy_shot(o)
@@ -973,17 +973,17 @@ local function start_enemy_shot(o)
  o.vy=0
  o.readytofire=nil
  o.update=update_enemy_shot
- update_obj_ani(o,sprs.en.throw)
+ update_obj_ani(o,sprs.enemy.throw)
  local bomb=add_bomb({
   x=o.x+(o.w<<1),
   y=o.y+(o.h<<1)
  },o.bombtmpl)
- add(bombs,bomb)
+ add(enbombs,bomb)
 end
 
 local function update_enemy_run(o)
  if o.readytofire
- and abs(nin.x+(nin.w<<2)-(o.x+(o.w<<2)))<2
+ and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
  then
   start_enemy_shot(o)
   return
@@ -1001,7 +1001,7 @@ local function update_enemy_run(o)
   o.x=x
  end
  o.flpx=o.vx<0
- update_obj_ani(o,sprs.en.run)
+ update_obj_ani(o,sprs.enemy.run)
 end
 
 start_enemy_run=function(o)
@@ -1027,7 +1027,7 @@ end
 local function update_game()
  update_objs()
  cleanup_dead_objs()
- cleanup(bombs,obj_dead)
+ cleanup(enbombs,obj_dead)
  cleanup(expls,obj_dead)
 end
 
@@ -1036,7 +1036,7 @@ local function draw_game()
  camera(cam.x,cam.y)
  draw_objs()
  camera()
- draw_life(nin.life)
+ draw_life(ninja.life)
 end
 
 local function start_game()
@@ -1044,8 +1044,8 @@ local function start_game()
  cam.y=384
  clear_game_objs()
  add_rooms()
- nin=add_ninja()
- en=add_enemy()
+ ninja=add_ninja()
+ enemy=add_enemy()
  poke(0X5F5C, 255)
  music(snds.gamemus)
  _update60=update_game
