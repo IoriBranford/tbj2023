@@ -104,8 +104,6 @@ end
 local function draw_obj_circ(o)
  local circ=o.fill and circfill
   or circ
- palt(o.palt)
- pal(o.pal)
  circ(o.x,o.y,o.rad,o.clr)
 end
 
@@ -119,8 +117,8 @@ local function draw_obj_sspr(o)
   end
   sw=sw or ((o.w or 1)<<3)
   sh=sh or ((o.h or 1)<<3)
-  palt(o.palt)
   pal(o.pal)
+  palt(o.palt or 0x8000)
   sspr(sx or 0,sy or 0,
    sw,sh,
    o.x,o.y,
@@ -134,16 +132,16 @@ local function draw_obj_spr(o)
   draw_obj_sspr(o)
   return
  end
- palt(o.palt)
  pal(o.pal)
+ palt(o.palt or 0x8000)
  spr(o.spri,o.x,o.y,o.w,o.h,
   xor(o.flpx,o.frmflpx),
   xor(o.flpy,o.frmflpy))
 end
 
 local function draw_obj_map(o)
- palt(o.palt)
  pal(o.pal)
+ palt(o.palt or 0x8000)
  map(o.celx,o.cely,o.x,o.y,o.celw,o.celh,o.layer)
 end
 
