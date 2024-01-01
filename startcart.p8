@@ -1167,8 +1167,37 @@ local function update_game()
  cleanup(expls,obj_dead)
 end
 
+local stars={}
+for y=16,80,32 do
+ for x=16,80,32 do
+  add(stars,x+rnd(32))
+  add(stars,y+rnd(32))
+ end
+end
+local clouds={}
+for y=104,120,16 do
+ for x=0,112,16 do
+  add(clouds,x+rnd(16))
+  add(clouds,y+rnd(16))
+ end
+end
+
+local function draw_sky()
+ pal()
+ circfill(96,24,4,6)
+ for i=2,#stars,2 do
+  pset(stars[i-1],stars[i],6)
+ end
+ for i=2,#clouds,2 do
+  local x,y=clouds[i-1],clouds[i]
+  circfill(x,y,16,13)
+  circfill(x-1,y+1,16,1)
+ end
+end
+
 local function draw_game()
- cls()
+ cls(1)
+ draw_sky()
  camera(cam.x,cam.y)
  draw_objs()
  camera()
