@@ -43,12 +43,18 @@ local function xor(a,b)
   return a and not b or b and not a
 end
 
+local function swappop(a,i)
+ local e=a[i]
+ a[i]=a[#a]
+ a[#a]=nil
+ return e
+end
+
 local function cleanup(a, cond)
  for i=#a,1,-1 do
   local o=a[i]
   if cond(o) then
-   a[i]=a[#a]
-   a[#a]=nil
+   swappop(a,i)
   end
  end
 end
