@@ -642,7 +642,7 @@ local ninclimbaccel=.5
 local nintopclimbspd=1.5
 local ninjumpvely=-2
 local ninjumpinvely=-2.5
-local ninblownoutvely=-4
+local ninblownoutvely=-3
 local ninthrowbombvely=-4
 local nininvul=180
 
