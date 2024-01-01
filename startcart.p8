@@ -1205,7 +1205,7 @@ for y=16,80,32 do
  end
 end
 local clouds={}
-for y=104,120,16 do
+for y=120,128,8 do
  for x=0,112,16 do
   add(clouds,x+rnd(16))
   add(clouds,y+rnd(16))
@@ -1214,6 +1214,11 @@ end
 
 local function draw_sky()
  pal()
+ fillp(░)
+ rectfill(0,100,128,104,1)
+ fillp(▒)
+ rectfill(0,104,128,128,1)
+ fillp()
  circfill(96,24,4,6)
  for i=2,#stars,2 do
   pset(stars[i-1],stars[i],6)
@@ -1226,7 +1231,7 @@ local function draw_sky()
 end
 
 local function draw_game()
- cls(1)
+ cls()
  draw_sky()
  camera(cam.x,cam.y)
  draw_objs()
@@ -1260,6 +1265,7 @@ end
 
 local function draw_title()
  cls()
+ draw_sky()
  draw_objs()
  draw_life(ninstartlife)
 end
