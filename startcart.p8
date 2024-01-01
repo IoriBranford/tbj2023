@@ -673,7 +673,8 @@ local nininvul=180
 
 local update_nin_ground,
  update_nin_air,
- start_nin_jumpin
+ start_nin_jumpin,
+ start_title
 
 local function update_nin_invul(o)
  if o.invul then
@@ -700,22 +701,33 @@ local function cam_on_nin(o)
  cam.y=min(cam.y+vy,worldbtm-128)
 end
 
+local function press_to_restart(o)
+ if btn()&0x3f~=0 then
+  start_title()
+ end
+end
+
 local function update_nin_death(o)
  update_obj_ani(o,sprs.ninja.blownup)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
  if o.y>cam.y+128 then
   if o.life>0 then
-   o.life=o.life-1
    o.dying=nil
    start_nin_jumpin(o)
   else
-   --game over
+   sfx(-1)
+   music(snds.deadmus)
+   o.update=press_to_restart
   end
  end
 end
 
 local function nin_start_dying(o)
+ o.life=o.life-1
+ if o.life<=0 then
+  music(-1)
+ end
  o.vx=0
  o.vy=ninblownoutvely
  o.dying=true
@@ -1252,7 +1264,8 @@ local function draw_title()
  draw_life(ninstartlife)
 end
 
-local function start_title()
+start_title=function()
+ pal()
  poke(0X5F5C, 0)
  clear_game_objs()
  camera()
