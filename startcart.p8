@@ -381,13 +381,13 @@ local sprs={
    {i=40,pal={9,10,4,9,10,4,9,10,4,9,10,4,9,10,4}},
    {i=40,pal={10,4,9,10,4,9,10,4,9,10,4,9,10,4,9}},
   },
-  getup=46,
+  getup={i=46,t=30},
  }
 }
 apply_sprs_bases(sprs)
 -->8
 --game world
-local ninja,enemy,enbombs,expls
+local ninja,enemy,enbombs,ninbombs,expls
 
 local solidflag=0
 local ladderflag=1
@@ -405,6 +405,7 @@ local function clear_game_objs()
  ninja=nil
  enemy=nil
  enbombs={}
+ ninbombs={}
  expls={}
 end
 
@@ -473,9 +474,6 @@ local function add_rooms()
 end
 -->8
 --bombs
-
-local obj_explode_bombs,
- obj_hit_any_expl
 
 local fusecolors={8,14,7}
 
@@ -581,9 +579,9 @@ local function add_bomb(o,tmpl)
  return o
 end
 
-local function obj_explode_bombs(o)
+local function obj_explode_bombs(o,bombs)
  local heldbomb=o.bomb
- for bomb in all(enbombs) do
+ for bomb in all(bombs) do
   if bomb~=o
   and bomb~=heldbomb
   and aabbs(o.x,o.y,
@@ -682,7 +680,7 @@ end
 
 local function nin_hit_objs(o)
  if not o.invul then
-  obj_explode_bombs(o)
+  obj_explode_bombs(o,enbombs)
   if obj_hit_any_expl(o) then
    nin_start_dying(o)
   end
@@ -829,12 +827,13 @@ end
 
 local function nin_find_catch_bomb(o)
  local x,y=o.x,o.y-4
- for bomb in all(enbombs) do
+ for i=1,#enbombs do
+  local b=enbombs[i]
   if aabbs(x,y,8,4,
-   bomb.x,bomb.y,
-   bomb.w<<3,bomb.h<<3)
+   b.x,b.y,
+   b.w<<3,b.h<<3)
   then
-   return bomb
+   return b,i
   end
  end
 end
@@ -846,14 +845,17 @@ local function nin_try_catch_bomb(o)
  local bomb=o.bomb
  if bomb then
   o.bomb=nil
+  add(ninbombs,bomb)
   start_bomb_thrown(bomb)
   bomb.vy=ninthrowbombvely
  else
-  bomb=nin_find_catch_bomb(o)
+  local bi
+  bomb,bi=nin_find_catch_bomb(o)
   if bomb then
    bomb.vx=0
    bomb.vy=0
    o.bomb=bomb
+   swappop(enbombs,bi)
    start_bomb_fuse(bomb)
    return bomb
   end
@@ -1001,10 +1003,25 @@ end
 --enemy
 
 local enemyrunspd=2
+local enemyhurtvely=-2
+local enemyhurttime=60
+local enemyjumpvely=-4
 
-local start_enemy_run
+local start_enemy_run,
+ start_enemy_hurt
+
+local function enemy_hit_objs(o)
+ obj_explode_bombs(o,ninbombs)
+ if obj_hit_any_expl(o) then
+  start_enemy_hurt(o)
+  return true
+ end
+end
 
 local function update_enemy_shot(o)
+ if enemy_hit_objs(o) then
+  return
+ end
  if obj_ani_ending(o) then
   start_enemy_run(o)
   return
@@ -1025,7 +1042,58 @@ local function start_enemy_shot(o)
  add(enbombs,bomb)
 end
 
+local function update_enemy_jump(o)
+ o.y=o.y+o.vy
+ update_obj_ani(o,sprs.enemy.jump)
+ if o.y<=o.desty then
+  o.y=o.desty
+  start_enemy_run(o)
+ end
+end
+
+local function start_enemy_jump(o)
+ o.vy=enemyjumpvely
+ o.desty=o.y-256
+ o.update=update_enemy_jump
+end
+
+local function update_enemy_getup(o)
+ update_obj_ani(o,sprs.enemy.getup)
+ if obj_ani_ending(o) then
+  start_enemy_jump(o)
+ end
+end
+
+local function update_enemy_hurt(o)
+ update_obj_ani(o,sprs.enemy.knocked)
+ o.vy=o.vy+ningrav
+ o.y=o.y+o.vy
+ if o.y>=o.desty then
+  o.y=o.desty
+  local time=o.time or 0
+  time=time+1
+  if time>enemyhurttime then
+   o.time=nil
+   o.desty=nil
+   o.update=update_enemy_getup
+   return
+  else
+   o.time=time
+  end
+ end
+end
+
+start_enemy_hurt=function(o)
+ o.vx=0
+ o.vy=enemyhurtvely
+ o.desty=o.y
+ o.update=update_enemy_hurt
+end
+
 local function update_enemy_run(o)
+ if enemy_hit_objs(o) then
+  return
+ end
  if o.readytofire
  and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
  then
