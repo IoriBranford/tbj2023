@@ -356,6 +356,19 @@ local sprs={
   _base=128,
   idle={0,1,t=15},
   prejump=2,
+  jump={loop=10,
+   {i=3,t=9,sfx=snds.jump},
+   {i=20,t=2},
+   {i=21,t=2},
+   {i=20,t=2,flpx=true,flpy=true},
+   {i=21,t=2,flpx=true,flpy=true},
+   {i=20,t=2},
+   {i=21,t=2},
+   {i=20,t=2,flpx=true,flpy=true},
+   {i=21,t=2,flpx=true,flpy=true},
+   {i=39,t=3},
+   {i=40,t=3}
+  },
   blownup={t=3,loop=3,
    {i=4,t=6,pal=pals.burn2,sfx=snds.nindie},
    {i=5,t=6,pal=pals.burn3},
@@ -830,14 +843,7 @@ end
 
 local function update_nin_air_ani(o)
  update_nin_flpx(o,dir_input_x())
- local vy=o.vy
- local ani
- if vy<0 then
-  ani=sprs.ninja.jump
- else
-  ani=sprs.ninja.zip
- end
- update_obj_ani(o,ani)
+ update_obj_ani(o,sprs.ninja.jump)
 end
 
 local function update_nin_ground_ani(o)
