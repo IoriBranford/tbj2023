@@ -673,8 +673,7 @@ local nininvul=180
 
 local update_nin_ground,
  update_nin_air,
- start_nin_jumpin,
- start_title
+ start_nin_jumpin
 
 local function update_nin_invul(o)
  if o.invul then
@@ -701,12 +700,6 @@ local function cam_on_nin(o)
  cam.y=min(cam.y+vy,worldbtm-128)
 end
 
-local function press_to_restart(o)
- if btn()&0x3f~=0 then
-  start_title()
- end
-end
-
 local function update_nin_death(o)
  update_obj_ani(o,sprs.ninja.blownup)
  o.vy=o.vy+ningrav
@@ -718,7 +711,7 @@ local function update_nin_death(o)
   else
    sfx(-1)
    music(snds.deadmus)
-   o.update=press_to_restart
+   kill_obj(o)
   end
  end
 end
@@ -1189,12 +1182,19 @@ local function add_enemy()
 end
 -->8
 --game phases
+local start_title
 
 local function update_game()
  update_objs()
  cleanup_dead_objs()
  cleanup(enbombs,obj_dead)
  cleanup(expls,obj_dead)
+
+ if obj_dead(ninja) then
+  if btn()&0x3f~=0 then
+   start_title()
+  end
+ end
 end
 
 local stars={}
