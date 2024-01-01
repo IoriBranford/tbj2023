@@ -328,6 +328,12 @@ local snds={
  ninthrow=40
 }
 
+local pals={
+ burn1={4,9,10,4,9,10,4,9,10,4,9,10,4,9,10},
+ burn2={9,10,4,9,10,4,9,10,4,9,10,4,9,10,4},
+ burn3={10,4,9,10,4,9,10,4,9,10,4,9,10,4,9},
+}
+
 local sprs={
  heart=64,
  expl={
@@ -350,10 +356,16 @@ local sprs={
   _base=128,
   idle={0,1,t=15},
   prejump=2,
-  jump={i=3,t=60,sfx=snds.jump},
-  blownup={t=6,loop=3,
-   {i=4,sfx=snds.nindie},
-   5,35,36},
+  blownup={t=3,loop=3,
+   {i=4,t=6,pal=pals.burn2,sfx=snds.nindie},
+   {i=5,t=6,pal=pals.burn3},
+   {i=35,pal=pals.burn1},
+   {i=36,pal=pals.burn2},
+   {i=35,pal=pals.burn3},
+   {i=36,pal=pals.burn1},
+   {i=35,pal=pals.burn2},
+   {i=36,pal=pals.burn3},
+  },
   die={4,5,6,t=12},
   swim={7,8,9,8,t=6},
   run={16,
@@ -400,9 +412,9 @@ local sprs={
   prethrow=34,
   throw={i=32,t=30},
   knocked={t=3,
-   {i=40,pal={4,9,10,4,9,10,4,9,10,4,9,10,4,9,10}},
-   {i=40,pal={9,10,4,9,10,4,9,10,4,9,10,4,9,10,4}},
-   {i=40,pal={10,4,9,10,4,9,10,4,9,10,4,9,10,4,9}},
+   {i=40,pal=pals.burn1},
+   {i=40,pal=pals.burn2},
+   {i=40,pal=pals.burn3},
   },
   getup={i=46,t=30,sfx=snds.engetup},
  }
