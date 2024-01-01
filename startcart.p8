@@ -171,9 +171,10 @@ end
 local function set_obj_frm(o,fi)
  fi=fi or 1
  local ani=o.ani
- local spri,ft
- local flpx,flpy
- local palt,pal
+ local spri,ft,
+  flpx,flpy,
+  palt,pal,
+  snd
  local typ=type(ani)
  if typ=="number" then
   spri=ani
@@ -187,6 +188,7 @@ local function set_obj_frm(o,fi)
    flpy=xor(f.flpy,ani.flpy)
    palt=f.palt
    pal=f.pal
+   snd=f.sfx
   else
    spri=typ=="number" and f
    flpx=ani.flpx
@@ -196,6 +198,10 @@ local function set_obj_frm(o,fi)
   ft=ft or ani.t
   palt=palt or ani.palt
   pal=pal or ani.pal
+  snd=snd or ani.sfx
+ end
+ if snd then
+  sfx(snd)
  end
  o.spri=spri or 1
  o.fi=fi
