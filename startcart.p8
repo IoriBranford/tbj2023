@@ -468,6 +468,9 @@ end
 -->8
 --bombs
 
+local obj_explode_bombs,
+ obj_hit_any_expl
+
 local fusecolors={8,14,7}
 
 local function draw_bomb(o)
@@ -572,6 +575,33 @@ local function add_bomb(o,tmpl)
  return o
 end
 
+local function obj_explode_bombs(o)
+ local heldbomb=o.bomb
+ for bomb in all(enbombs) do
+  if bomb~=o
+  and bomb~=heldbomb
+  and aabbs(o.x,o.y,
+   o.w<<3,o.h<<3,
+   bomb.x+(bomb.w<<1),
+   bomb.y+(bomb.w<<1),
+   bomb.w<<2,bomb.h<<2)
+  then
+   bomb_explode(bomb)
+  end
+ end
+end
+
+local function obj_hit_any_expl(o)
+ for expl in all(expls) do
+  if aabbs(o.x,o.y,
+   o.w<<3,o.h<<3,
+   expl.x,expl.y,
+   expl.w<<3,expl.h<<3)
+  then
+   return expl
+  end
+ end
+end
 -->8
 --ninja
 
@@ -645,29 +675,10 @@ local function nin_start_dying(o)
 end
 
 local function nin_hit_objs(o)
- if o.invul then
-  return
- end
-
- for bomb in all(enbombs) do
-  if aabbs(o.x,o.y,
-   o.w<<3,o.h<<3,
-   bomb.x+(bomb.w<<2),
-   bomb.y+(bomb.h<<2),
-   0,0)
-  then
-   bomb_explode(bomb)
-  end
- end
-
- for expl in all(expls) do
-  if aabbs(o.x,o.y,
-   o.w<<3,o.h<<3,
-   expl.x,expl.y,
-   expl.w<<3,expl.h<<3)
-  then
+ if not o.invul then
+  obj_explode_bombs(o)
+  if obj_hit_any_expl(o) then
    nin_start_dying(o)
-   break
   end
  end
 end
