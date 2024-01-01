@@ -1209,8 +1209,8 @@ local function start_game()
  cam.y=384
  clear_game_objs()
  add_rooms()
- ninja=add_ninja()
  enemy=add_enemy()
+ ninja=add_ninja()
  poke(0X5F5C, 255)
  music(snds.gamemus)
  _update60=update_game
