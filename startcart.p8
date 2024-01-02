@@ -43,6 +43,16 @@ local function xor(a,b)
   return a and not b or b and not a
 end
 
+local function scopy(a)
+ if a then
+  local c={}
+  for i=1,#a do
+   c[i]=a[i]
+  end
+  return c
+ end
+end
+
 local function swappop(a,i)
  local e=a[i]
  a[i]=a[#a]
@@ -1113,6 +1123,7 @@ local function set_enemy_level(o,l)
   for k,v in pairs(lvl) do
    o[k]=v
   end
+  o.ladderdrops=scopy(o.ladderdrops)
  end
 end
 
