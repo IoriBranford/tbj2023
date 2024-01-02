@@ -532,6 +532,11 @@ local function draw_bomb(o)
   print(secs,o.x+2,o.y-8,clr)
  end
  draw_obj_spr(o)
+ if clr then
+  pset(o.x+2+rnd(4),
+   o.y-1+rnd(4),
+   clr)
+ end
 end
 
 local function update_expl(o)
