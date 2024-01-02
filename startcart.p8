@@ -872,10 +872,10 @@ local function nin_try_jump(o,holdok)
 end
 
 local function nin_find_catch_bomb(o)
- local x,y=o.x,o.y-4
+ local x,y=o.x-4,o.y-4
  for i=1,#enbombs do
   local b=enbombs[i]
-  if aabbs(x,y,8,4,
+  if aabbs(x,y,16,12,
    b.x,b.y,
    b.w<<3,b.h<<3)
   then
