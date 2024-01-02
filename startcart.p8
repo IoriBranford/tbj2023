@@ -1064,7 +1064,7 @@ local enemyhurttime=60
 local enemyjumpvely=-4
 
 local enemylevels={
- {bombtmpl=bombtmpls.normal,ladderdrops={32,104}},
+ {bombtmpl=bombtmpls.normal,ladderdrops={32,88}},
  {bombtmpl=bombtmpls.normal,},
 }
 
