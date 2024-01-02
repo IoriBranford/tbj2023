@@ -1215,9 +1215,9 @@ end
 local function draw_sky()
  pal()
  fillp(░)
- rectfill(0,100,128,104,1)
+ rectfill(0,104,128,108,1)
  fillp(▒)
- rectfill(0,104,128,128,1)
+ rectfill(0,108,128,128,1)
  fillp()
  circfill(96,24,4,6)
  for i=2,#stars,2 do
