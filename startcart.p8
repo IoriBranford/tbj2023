@@ -1300,7 +1300,9 @@ start_credits=function()
  add_obj_text {
   x=16,y=128,
   update=function(o)
-   o.y=o.y-.125
+   local vy=(btn(⬆️) or btn(⬇️))
+    and -1 or -.125
+   o.y=max(8,o.y+vy)
   end,
   text=[[
 A toy box jam 2023 GAME
