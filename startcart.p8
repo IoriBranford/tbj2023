@@ -1112,7 +1112,6 @@ local function set_enemy_level(o,l)
 end
 
 local function update_enemy_jump(o)
- o.y=o.y+o.vy
  local ladders=o.ladderdrops
  if ladders then
   local ly=o.laddery or o.y
@@ -1122,6 +1121,7 @@ local function update_enemy_jump(o)
   end
   o.laddery=ly+8
  end
+ o.y=o.y+o.vy
  update_obj_ani(o,sprs.enemy.jump)
  if o.y<=o.desty then
   o.y=o.desty
