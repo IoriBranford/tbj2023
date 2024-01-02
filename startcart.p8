@@ -1131,7 +1131,7 @@ end
 
 local function start_enemy_jump(o)
  o.vy=enemyjumpvely
- o.desty=o.y-256
+ o.desty=o.y-128
  o.update=update_enemy_jump
 end
 
