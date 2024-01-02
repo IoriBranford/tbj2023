@@ -1044,6 +1044,7 @@ local function add_ninja()
 end
 
 local function draw_life(life)
+ pal()
  local y=121
  local x=0
  for i=1,life do
