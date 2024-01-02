@@ -1147,6 +1147,7 @@ local function update_enemy_run(o)
   return
  end
  if o.readytofire
+ and ninja.y<o.y+128
  and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
  then
   start_enemy_shot(o)
