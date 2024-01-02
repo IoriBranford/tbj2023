@@ -1219,19 +1219,6 @@ end
 --game phases
 local start_title
 
-local function update_game()
- update_objs()
- cleanup_dead_objs()
- cleanup(enbombs,obj_dead)
- cleanup(expls,obj_dead)
-
- if obj_dead(ninja) then
-  if btn()&0x3f~=0 then
-   start_title()
-  end
- end
-end
-
 local stars={}
 for y=16,80,32 do
  for x=16,80,32 do
@@ -1265,6 +1252,70 @@ local function draw_sky()
  end
 end
 
+local function draw_credits()
+ cls()
+ draw_sky()
+ draw_objs()
+end
+
+local function update_credits()
+ update_objs()
+ if btnp(🅾️) then
+  start_title()
+ end
+end
+
+local function start_credits()
+ camera()
+ clear_game_objs()
+ add_obj_text {
+  x=16,y=128,
+  update=function(o)
+   o.y=o.y-.125
+  end,
+  text=[[
+A toy box jam 2023 GAME
+
+CONCEPT
+DESIGN
+PROGRAM
+
+ iori branford
+
+GRAPHICS
+SOUNDS
+
+ tom hall
+ lafolie
+ toby hefflin
+
+MUSIC
+
+ gruber
+]]
+ }
+ add_obj_text {
+  text="🅾️close",
+  x=96,y=120
+ }
+ music(snds.endmus)
+ _update60=update_credits
+ _draw=draw_credits
+end
+
+local function update_game()
+ update_objs()
+ cleanup_dead_objs()
+ cleanup(enbombs,obj_dead)
+ cleanup(expls,obj_dead)
+
+ if obj_dead(ninja) then
+  if btn()&0x3f~=0 then
+   start_title()
+  end
+ end
+end
+
 local function draw_game()
  cls()
  draw_sky()
@@ -1288,8 +1339,10 @@ local function start_game()
 end
 
 local function update_title()
- if btnp(🅾️) or btnp(❎) then
+ if btnp(🅾️) then
   start_game()
+ elseif btnp(❎) then
+  start_credits()
  elseif btnp(⬅️) then
   ninstartlife=max(1,ninstartlife-1)
  elseif btnp(➡️) then
@@ -1319,7 +1372,8 @@ start_title=function()
    "wolf triad!",
    "",
    "⬅️/➡️ set starting life 1-9",
-   "🅾️ start game"
+   "🅾️ start game",
+   "❎ view credits",
   }
  }
  music(snds.titlemus)
