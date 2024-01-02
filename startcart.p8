@@ -433,7 +433,7 @@ apply_sprs_bases(sprs)
 -->8
 --game world
 local ninja,enemy,enbombs,ninbombs,expls
-
+local hazeclr,hazeptn
 local solidflag=0
 local ladderflag=1
 
@@ -454,6 +454,8 @@ local function clear_game_objs()
  enbombs={}
  ninbombs={}
  expls={}
+ hazeclr=nil
+ hazeptn=nil
 end
 
 local function room_cell(x,y)
@@ -1137,9 +1139,30 @@ local function start_enemy_jump(o)
 end
 
 local function update_enemy_getup(o)
+ set_enemy_level(o,o.level+1)
  update_obj_ani(o,sprs.enemy.getup)
  if obj_ani_ending(o) then
   start_enemy_jump(o)
+ end
+end
+
+local function update_enemy_dying(o)
+ local i=(o.dyingtime or 0)+1
+ o.dyingtime=i
+ if i<=300 then
+  if i%6==0 then
+   add_expls(o.x+rnd(16),o.y+rnd(16))
+  end
+  if i==300 then
+   hazeptn=░
+   hazeclr=0
+  end
+ elseif i==330 then
+  hazeptn=▒
+ elseif i==360 then
+  hazeptn=█
+ elseif i==480 then
+  kill_obj(o)
  end
 end
 
@@ -1154,8 +1177,9 @@ local function update_enemy_hurt(o)
   if time>enemyhurttime then
    o.time=nil
    o.desty=nil
-   o.update=update_enemy_getup
-   return
+   o.update=o.level<#enemylevels
+    and update_enemy_getup
+    or update_enemy_dying
   else
    o.time=time
   end
@@ -1167,8 +1191,9 @@ start_enemy_hurt=function(o)
  o.vy=enemyhurtvely
  o.desty=o.y
  o.update=update_enemy_hurt
- if o.level<#enemylevels then
-  set_enemy_level(o,o.level+1)
+ ninja.invul=180
+ if o.level>=#enemylevels then
+  music(-1)
  end
  sfx(snds.expl2)
 end
@@ -1216,10 +1241,12 @@ local function add_enemy()
  }
  set_enemy_level(o,1)
  start_enemy_run(o)
+ return o
 end
 -->8
 --game phases
-local start_title
+local start_title,
+ start_credits
 
 local stars={}
 for y=16,80,32 do
@@ -1267,7 +1294,7 @@ local function update_credits()
  end
 end
 
-local function start_credits()
+start_credits=function()
  camera()
  clear_game_objs()
  add_obj_text {
@@ -1315,6 +1342,8 @@ local function update_game()
   if btn()&0x3f~=0 then
    start_title()
   end
+ elseif obj_dead(enemy) then
+  start_credits()
  end
 end
 
@@ -1325,6 +1354,10 @@ local function draw_game()
  draw_objs()
  camera()
  draw_life(ninja.life)
+ if hazeptn and hazeclr then
+  fillp(hazeptn)
+  rectfill(0,0,128,128,hazeclr)
+ end
 end
 
 local function start_game()
