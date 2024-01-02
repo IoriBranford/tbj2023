@@ -1365,17 +1365,15 @@ start_title=function()
  clear_game_objs()
  camera()
  add_obj_text {
-  text={
-   "   rise   ",
-   "  to the  ",
-   " commander",
-   "  of the  ",
-   "wolf triad!",
-   "",
-   "⬅️/➡️ set starting life 1-9",
-   "🅾️ start game",
-   "❎ view credits",
-  }
+  x=8,y=48,
+  text=[[
+rise to the commander
+  of the wolf triad
+
+⬅️/➡️ set starting life 1-9
+🅾️ start game
+❎ view credits
+]]
  }
  music(snds.titlemus)
  _update60=update_title
