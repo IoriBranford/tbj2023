@@ -1358,6 +1358,7 @@ local function draw_title()
 end
 
 start_title=function()
+ reload(0x2000,0x2000,0x1000)
  pal()
  poke(0X5F5C, 0)
  clear_game_objs()
