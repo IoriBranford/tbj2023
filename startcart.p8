@@ -430,7 +430,8 @@ local sprs={
    {i=40,pal=pals.burn3},
   },
   getup={i=46,t=30,sfx=snds.engetup},
- }
+ },
+ ladder=189
 }
 apply_sprs_bases(sprs)
 -->8
@@ -1058,6 +1059,11 @@ local enemyhurtvely=-2
 local enemyhurttime=60
 local enemyjumpvely=-4
 
+local enemylevels={
+ {bombtmpl=bombtmpls.normal,ladderdrops={32,104}},
+ {bombtmpl=bombtmpls.normal,},
+}
+
 local start_enemy_run,
  start_enemy_hurt
 
@@ -1093,11 +1099,31 @@ local function start_enemy_shot(o)
  add(enbombs,bomb)
 end
 
+local function set_enemy_level(o,l)
+ o.level=l
+ local lvl=enemylevels[l]
+ if lvl then
+  for k,v in pairs(lvl) do
+   o[k]=v
+  end
+ end
+end
+
 local function update_enemy_jump(o)
  o.y=o.y+o.vy
+ local ladders=o.ladderdrops
+ if ladders then
+  local ly=o.laddery or o.y
+  for lx in all(ladders) do
+   local c,r=room_cell(lx,ly)
+   mset(c,r,sprs.ladder)
+  end
+  o.laddery=ly+8
+ end
  update_obj_ani(o,sprs.enemy.jump)
  if o.y<=o.desty then
   o.y=o.desty
+  o.laddery=nil
   start_enemy_run(o)
  end
 end
@@ -1139,6 +1165,9 @@ start_enemy_hurt=function(o)
  o.vy=enemyhurtvely
  o.desty=o.y
  o.update=update_enemy_hurt
+ if o.level<#enemylevels then
+  set_enemy_level(o,o.level+1)
+ end
  sfx(snds.expl2)
 end
 
@@ -1182,8 +1211,8 @@ local function add_enemy()
   x=56,y=384,
   vx=0,vy=0,
   w=2,h=2,
-  bombtmpl=bombtmpls.normal
  }
+ set_enemy_level(o,1)
  start_enemy_run(o)
 end
 -->8
