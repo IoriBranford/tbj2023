@@ -545,9 +545,7 @@ local function update_expl(o)
  end
 end
 
-local function bomb_explode(o)
- local cx=o.x+(o.w<<2)
- local cy=o.y+(o.h<<2)
+local function add_expls(cx,cy)
  add_obj_spr {
   x=cx-8,y=cy-8,
   ani=sprs.expl.tl,
@@ -573,6 +571,11 @@ local function bomb_explode(o)
   ani=sprs.expl.ctr,
   update=update_expl
  })
+end
+
+local function bomb_explode(o)
+ add_expls(o.x+(o.w<<2),
+  o.y+(o.h<<2))
  kill_obj(o)
 end
 
