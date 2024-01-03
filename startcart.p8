@@ -3,7 +3,7 @@ version 41
 __lua__
 -- asset handling
 
-local function apply_spr_base(spr,base)
+function apply_spr_base(spr,base)
  local typ=type(spr)
  if typ=="number" then
   return spr+base
@@ -22,7 +22,7 @@ local function apply_spr_base(spr,base)
  return spr
 end
 
-local function apply_sprs_bases(sprs)
+function apply_sprs_bases(sprs)
  for name,spr in pairs(sprs) do
   local base=type(spr)=="table"
    and spr._base
@@ -37,13 +37,13 @@ end
 -->8
 --utility
 
-local function nop() end
+function nop() end
 
-local function xor(a,b)
+function xor(a,b)
   return a and not b or b and not a
 end
 
-local function scopy(a)
+function scopy(a)
  if a then
   local c={}
   for i=1,#a do
@@ -53,14 +53,14 @@ local function scopy(a)
  end
 end
 
-local function swappop(a,i)
+function swappop(a,i)
  local e=a[i]
  a[i]=a[#a]
  a[#a]=nil
  return e
 end
 
-local function cleanup(a, cond)
+function cleanup(a, cond)
  for i=#a,1,-1 do
   local o=a[i]
   if cond(o) then
@@ -69,24 +69,24 @@ local function cleanup(a, cond)
  end
 end
 
-local function dir_input_x()
+function dir_input_x()
  return
   (btn(⬅️) and -1 or 0) +
   (btn(➡️) and 1 or 0)
 end
 
-local function dir_input_y()
+function dir_input_y()
  return
   (btn(⬆️) and -1 or 0) +
   (btn(⬇️) and 1 or 0)
 end
 
-local function dir_input()
+function dir_input()
  return dir_input_x(),
   dir_input_y()
 end
 
-local function aabbs(x,y,w,h,a,b,m,n)
+function aabbs(x,y,w,h,a,b,m,n)
  return x+w>a and x<a+m
   and y+h>b and y<b+n
 end
@@ -96,7 +96,7 @@ end
 
 local objs={}
 
-local function draw_obj_text(o)
+function draw_obj_text(o)
  local text=o.text
  local typ=type(text)
  if typ=="table" then
@@ -111,13 +111,13 @@ local function draw_obj_text(o)
  end
 end
 
-local function draw_obj_circ(o)
+function draw_obj_circ(o)
  local circ=o.fill and circfill
   or circ
  circ(o.x,o.y,o.rad,o.clr)
 end
 
-local function draw_obj_sspr(o)
+function draw_obj_sspr(o)
   local sx,sy=o.sx,o.sy
   local sw,sh=o.sw,o.sh
   local i=o.spri
@@ -137,7 +137,7 @@ local function draw_obj_sspr(o)
    xor(o.flpy,o.frmflpy))
 end
  
-local function draw_obj_spr(o)
+function draw_obj_spr(o)
  if o.dw or o.dh then
   draw_obj_sspr(o)
   return
@@ -149,13 +149,13 @@ local function draw_obj_spr(o)
   xor(o.flpy,o.frmflpy))
 end
 
-local function draw_obj_map(o)
+function draw_obj_map(o)
  pal(o.pal)
  palt(o.palt or 0x8000)
  map(o.celx,o.cely,o.x,o.y,o.celw,o.celh,o.layer)
 end
 
-local function add_obj(o)
+function add_obj(o)
  add(objs,o)
  o.age=0
  o.x=o.x or 0
@@ -164,21 +164,21 @@ local function add_obj(o)
  o.draw=o.draw or nop
 end
 
-local function add_obj_circ(o)
+function add_obj_circ(o)
  add_obj(o)
  o.rad=o.rad or 1
  o.clr=o.clr or 1
  o.draw=draw_obj_circ
 end
 
-local function add_obj_text(o)
+function add_obj_text(o)
  add_obj(o)
  o.clr=o.clr or 7
  o.lineh=o.lineh or 8
  o.draw=draw_obj_text
 end
 
-local function set_obj_frm(o,fi)
+function set_obj_frm(o,fi)
  fi=fi or 1
  local ani=o.ani
  local spri,ft,
@@ -222,12 +222,12 @@ local function set_obj_frm(o,fi)
  o.pal=pal
 end
 
-local function start_obj_ani(o,ani,fi)
+function start_obj_ani(o,ani,fi)
  o.ani=ani
  set_obj_frm(o,fi)
 end
 
-local function update_obj_ani(o,ani)
+function update_obj_ani(o,ani)
  if ani and ani~=o.ani then
   start_obj_ani(o,ani)
   return
@@ -249,7 +249,7 @@ local function update_obj_ani(o,ani)
  end
 end
 
-local function add_obj_spr(o)
+function add_obj_spr(o)
  add_obj(o)
  o.w=o.w or 1
  o.h=o.h or 1
@@ -261,17 +261,17 @@ local function add_obj_spr(o)
  return o
 end
 
-local function obj_frm_ending(o)
+function obj_frm_ending(o)
  return (o.ft or 1)<=1
 end
 
-local function obj_ani_ending(o)
+function obj_ani_ending(o)
  local ani=o.ani
  local n=type(ani)=="table" and #ani or 1
  return n<=(o.fi or 1) and obj_frm_ending(o)
 end
 
-local function add_obj_map(o)
+function add_obj_map(o)
  add_obj(o)
  o.draw=draw_obj_map
  o.celx=o.celx or 0
@@ -280,15 +280,15 @@ local function add_obj_map(o)
  o.celh=o.celh or 1
 end
 
-local function obj_dead(o)
+function obj_dead(o)
   return o.age<0
 end
 
-local function kill_obj(o)
+function kill_obj(o)
  o.age=-0x8000
 end
 
-local function update_objs()
+function update_objs()
  for i=1,#objs do
   local o=objs[i]
   o.age=o.age+1
@@ -296,18 +296,18 @@ local function update_objs()
  end
 end
 
-local function draw_objs()
+function draw_objs()
  for i=1,#objs do
   local o=objs[i]
   o:draw()
  end
 end
 
-local function cleanup_dead_objs()
+function cleanup_dead_objs()
  cleanup(objs, obj_dead)
 end
 
-local function clear_objs()
+function clear_objs()
  for i=#objs,1,-1 do
   objs[i]=nil
  end
@@ -458,7 +458,7 @@ local rooms={ --<y,{celx,cely}>
 }
 local worldbtm=768
 
-local function clear_game_objs()
+function clear_game_objs()
  clear_objs()
  ninja=nil
  enemy=nil
@@ -469,7 +469,7 @@ local function clear_game_objs()
  hazeptn=nil
 end
 
-local function room_cell(x,y)
+function room_cell(x,y)
  x,y=flr(x),flr(y)
  local room=rooms[y&~0x7F]
  if room then
@@ -479,7 +479,7 @@ local function room_cell(x,y)
  end
 end
 
-local function cell_bound(x,y,axis,dir)
+function cell_bound(x,y,axis,dir)
  local c,r=room_cell(x,y)
  if c and fget(mget(c,r),solidflag) then
   local v=axis>0 and y or x
@@ -491,7 +491,7 @@ local function cell_bound(x,y,axis,dir)
  end
 end
 
-local function obj_ground(o)
+function obj_ground(o)
  local w,h=o.w<<3,o.h<<3
  local x,y=o.x,o.y+h
  for x=x,x+w-1,w-1 do
@@ -502,7 +502,7 @@ local function obj_ground(o)
  end
 end
 
-local function cell_ladder(x,y,axis)
+function cell_ladder(x,y,axis)
  local c,r=room_cell(x,y)
  if c and fget(mget(c,r),ladderflag) then
   local v=axis>0 and y or x
@@ -510,7 +510,7 @@ local function cell_ladder(x,y,axis)
  end
 end
 
-local function obj_ladder(o)
+function obj_ladder(o)
  local w,h=o.w<<3,o.h<<3
  local x,y=o.x,o.y
  for x=x,x+w-1,w-1 do
@@ -521,7 +521,7 @@ local function obj_ladder(o)
  end
 end
 
-local function add_rooms()
+function add_rooms()
  for y,room in pairs(rooms) do
   add_obj_map({
    y=y,
@@ -537,7 +537,7 @@ end
 
 local fusecolors={8,14,7}
 
-local function draw_bomb(o)
+function draw_bomb(o)
  local secs=ceil((o.fuse or -1)/60)
  local clr=fusecolors[secs]
  if clr then
@@ -551,14 +551,14 @@ local function draw_bomb(o)
  end
 end
 
-local function update_expl(o)
+function update_expl(o)
  update_obj_ani(o)
  if obj_ani_ending(o) then
   kill_obj(o)
  end
 end
 
-local function add_expls(cx,cy)
+function add_expls(cx,cy)
  add_obj_spr {
   x=cx-8,y=cy-8,
   ani=sprs.expl.tl,
@@ -586,13 +586,13 @@ local function add_expls(cx,cy)
  })
 end
 
-local function bomb_explode(o)
+function bomb_explode(o)
  add_expls(o.x+(o.w<<2),
   o.y+(o.h<<2))
  kill_obj(o)
 end
 
-local function update_bomb_normal(o)
+function update_bomb_normal(o)
  o.y=o.y+o.vy
  if o.y>cam.y+128
  or o.x+(o.w<<3)<cam.x then
@@ -601,7 +601,7 @@ local function update_bomb_normal(o)
  update_obj_ani(o)
 end
 
-local function update_bomb_fuse(o)
+function update_bomb_fuse(o)
  o.fuse=o.fuse-1
  if o.fuse<=0 then
   bomb_explode(o)
@@ -609,13 +609,13 @@ local function update_bomb_fuse(o)
  update_obj_ani(o)
 end
 
-local function start_bomb_fuse(o)
+function start_bomb_fuse(o)
  o.fuse=abs(o.fuse)
  o.updateonthrow=o.update
  o.update=update_bomb_fuse
 end
 
-local function start_bomb_thrown(o)
+function start_bomb_thrown(o)
  o.update=o.updateonthrow
  o.updateonthrow=nil
  o.fuse=-1
@@ -632,7 +632,7 @@ local bombtmpls={
  }
 }
 
-local function add_bomb(o,tmpl)
+function add_bomb(o,tmpl)
  if type(tmpl)=="string" then
   tmpl=bombtmpls[tmpl]
  end
@@ -647,7 +647,7 @@ local function add_bomb(o,tmpl)
  return o
 end
 
-local function obj_explode_bombs(o,bombs)
+function obj_explode_bombs(o,bombs)
  local heldbomb=o.bomb
  for bomb in all(bombs) do
   if bomb~=o
@@ -663,7 +663,7 @@ local function obj_explode_bombs(o,bombs)
  end
 end
 
-local function obj_hit_any_expl(o)
+function obj_hit_any_expl(o)
  for expl in all(expls) do
   if aabbs(o.x,o.y,
    o.w<<3,o.h<<3,
@@ -691,11 +691,7 @@ local ninblownoutvely=-3
 local ninthrowbombvely=-4
 local nininvul=180
 
-local update_nin_ground,
- update_nin_air,
- start_nin_jumpin
-
-local function update_nin_invul(o)
+function update_nin_invul(o)
  if o.invul then
   o.invul=o.invul-1
   if o.invul<=0 then
@@ -704,7 +700,7 @@ local function update_nin_invul(o)
  end
 end
 
-local function nin_update_held_bomb(o)
+function nin_update_held_bomb(o)
  local b=o.bomb
  if b then
   if obj_dead(b) then
@@ -715,12 +711,12 @@ local function nin_update_held_bomb(o)
  end
 end
 
-local function cam_on_nin(o)
+function cam_on_nin(o)
  local vy=mid(-camtopspd,o.y-96-cam.y,camtopspd)
  cam.y=min(cam.y+vy,worldbtm-128)
 end
 
-local function update_nin_death(o)
+function update_nin_death(o)
  update_obj_ani(o,sprs.ninja.blownup)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
@@ -736,7 +732,7 @@ local function update_nin_death(o)
  end
 end
 
-local function nin_start_dying(o)
+function nin_start_dying(o)
  o.life=o.life-1
  if o.life<=0 then
   music(-1)
@@ -751,7 +747,7 @@ local function nin_start_dying(o)
  end
 end
 
-local function nin_hit_objs(o)
+function nin_hit_objs(o)
  if not o.invul then
   obj_explode_bombs(o,enbombs)
   if obj_hit_any_expl(o) then
@@ -760,7 +756,7 @@ local function nin_hit_objs(o)
  end
 end
 
-local function nin_coll_vy(x,y,w,h,vy)
+function nin_coll_vy(x,y,w,h,vy)
  local bnd,edge,cmp
 
  if vy<0 then
@@ -785,7 +781,7 @@ local function nin_coll_vy(x,y,w,h,vy)
  return cmp(0,bnd-edge)
 end
 
-local function nin_coll_vx(x,y,w,h,vx)
+function nin_coll_vx(x,y,w,h,vx)
  local bnd,edge,cmp
 
  if vx<0 then
@@ -812,7 +808,7 @@ local function nin_coll_vx(x,y,w,h,vx)
  return cmp(0,bnd-edge)
 end
 
-local function nin_move_x(o)
+function nin_move_x(o)
  local inx=
   (btn(⬅️) and -1 or 0) +
   (btn(➡️) and 1 or 0)
@@ -831,7 +827,7 @@ local function nin_move_x(o)
  o.x=o.x+vx
 end
 
-local function nin_climb_y(o)
+function nin_climb_y(o)
  local iny=
   (btn(⬆️) and -1 or 0) +
   (btn(⬇️) and 1 or 0)
@@ -852,7 +848,7 @@ local function nin_climb_y(o)
  return collvy
 end
 
-local function nin_drop_y(o)
+function nin_drop_y(o)
  local vx,vy=o.vx,o.vy
  vy=min(vy+ningrav,nintopfallspd)
  vy=vy+nin_coll_vy(o.x,o.y+vy,o.w<<3,o.h<<3,vy)
@@ -860,18 +856,18 @@ local function nin_drop_y(o)
  o.y=o.y+vy
 end
 
-local function update_nin_flpx(o,dirx)
+function update_nin_flpx(o,dirx)
  if dirx~=0 then
   o.flpx=dirx<0
  end
 end
 
-local function update_nin_air_ani(o)
+function update_nin_air_ani(o)
  update_nin_flpx(o,dir_input_x())
  update_obj_ani(o,sprs.ninja.jump)
 end
 
-local function update_nin_ground_ani(o)
+function update_nin_ground_ani(o)
  local inx=dir_input_x()
  update_nin_flpx(o,inx)
  local ani
@@ -883,7 +879,7 @@ local function update_nin_ground_ani(o)
  update_obj_ani(o,ani)
 end
 
-local function nin_try_jump(o,holdok)
+function nin_try_jump(o,holdok)
  if holdok and btn(🅾️) or btnp(🅾️) then
   o.vy=ninjumpvely
   o.update=update_nin_air
@@ -891,12 +887,12 @@ local function nin_try_jump(o,holdok)
  end
 end
 
-local function nin_catch_box(o)
+function nin_catch_box(o)
  local w,h=o.w<<3,o.h<<2
  return o.x,o.y-h,w,h
 end
 
-local function nin_find_catch_bomb(o)
+function nin_find_catch_bomb(o)
  local x,y,w,h=nin_catch_box(o)
  for i=1,#enbombs do
   local b=enbombs[i]
@@ -909,7 +905,7 @@ local function nin_find_catch_bomb(o)
  end
 end
 
-local function nin_try_catch_bomb(o)
+function nin_try_catch_bomb(o)
  if not btnp(⬆️) then
   return
  end
@@ -935,7 +931,7 @@ local function nin_try_catch_bomb(o)
  end
 end
 
-local function update_nin_climb_ani(o)
+function update_nin_climb_ani(o)
  local iny=dir_input_y()
  local ani
  if iny~=0 then
@@ -946,7 +942,7 @@ local function update_nin_climb_ani(o)
  update_obj_ani(o,ani)
 end
 
-local function update_nin_climb(o)
+function update_nin_climb(o)
  nin_hit_objs(o)
  if o.dying then
   return
@@ -966,7 +962,7 @@ local function update_nin_climb(o)
  cam_on_nin(o)
 end
 
-local function nin_try_climb(o)
+function nin_try_climb(o)
  local iny=dir_input_y()
  local climbldr=iny~=0
   and not o.bomb
@@ -981,7 +977,7 @@ local function nin_try_climb(o)
  end
 end
 
-update_nin_air=function(o)
+function update_nin_air(o)
  nin_hit_objs(o)
  if o.dying then
   return
@@ -1004,7 +1000,7 @@ update_nin_air=function(o)
  cam_on_nin(o)
 end
 
-update_nin_ground=function(o)
+function update_nin_ground(o)
  nin_hit_objs(o)
  if o.dying then
   return
@@ -1028,7 +1024,7 @@ update_nin_ground=function(o)
  cam_on_nin(o)
 end
 
-local function update_nin_jumpin(o)
+function update_nin_jumpin(o)
  local vy=o.vy
  vy=min(vy+ningrav,nintopfallspd)
  o.vy=vy
@@ -1040,7 +1036,7 @@ local function update_nin_jumpin(o)
  end
 end
 
-start_nin_jumpin=function(o)
+function start_nin_jumpin(o)
  o.x=60
  o.y=cam.y+128
  o.vx=0
@@ -1049,13 +1045,13 @@ start_nin_jumpin=function(o)
  o.update=update_nin_jumpin
 end
 
-local function draw_ninja(o)
+function draw_ninja(o)
  if (o.invul or 0)%2==0 then
   draw_obj_spr(o)
  end
 end
 
-local function add_ninja()
+function add_ninja()
  local o=add_obj_spr {
   life=ninstartlife
  }
@@ -1064,7 +1060,7 @@ local function add_ninja()
  return o
 end
 
-local function draw_life(life)
+function draw_life(life)
  pal()
  local y=121
  local x=0
@@ -1086,10 +1082,7 @@ local enemylevels={
  {bombtmpl=bombtmpls.normal,},
 }
 
-local start_enemy_run,
- start_enemy_hurt
-
-local function enemy_hit_objs(o)
+function enemy_hit_objs(o)
  obj_explode_bombs(o,ninbombs)
  if obj_hit_any_expl(o) then
   start_enemy_hurt(o)
@@ -1097,7 +1090,7 @@ local function enemy_hit_objs(o)
  end
 end
 
-local function update_enemy_shot(o)
+function update_enemy_shot(o)
  if enemy_hit_objs(o) then
   return
  end
@@ -1108,7 +1101,7 @@ local function update_enemy_shot(o)
  update_obj_ani(o,sprs.enemy.throw)
 end
 
-local function start_enemy_shot(o)
+function start_enemy_shot(o)
  o.vx=0
  o.vy=0
  o.readytofire=nil
@@ -1121,7 +1114,7 @@ local function start_enemy_shot(o)
  add(enbombs,bomb)
 end
 
-local function set_enemy_level(o,l)
+function set_enemy_level(o,l)
  o.level=l
  local lvl=enemylevels[l]
  if lvl then
@@ -1132,7 +1125,7 @@ local function set_enemy_level(o,l)
  end
 end
 
-local function update_enemy_jump(o)
+function update_enemy_jump(o)
  local ladders=o.ladderdrops
  if ladders then
   local ly=o.laddery or o.y
@@ -1159,13 +1152,13 @@ local function update_enemy_jump(o)
  end
 end
 
-local function start_enemy_jump(o)
+function start_enemy_jump(o)
  o.vy=enemyjumpvely
  o.desty=o.y-128
  o.update=update_enemy_jump
 end
 
-local function update_enemy_getup(o)
+function update_enemy_getup(o)
  set_enemy_level(o,o.level+1)
  update_obj_ani(o,sprs.enemy.getup)
  if obj_ani_ending(o) then
@@ -1173,7 +1166,7 @@ local function update_enemy_getup(o)
  end
 end
 
-local function update_enemy_dying(o)
+function update_enemy_dying(o)
  local i=(o.dyingtime or 0)+1
  o.dyingtime=i
  if i<=300 then
@@ -1193,7 +1186,7 @@ local function update_enemy_dying(o)
  end
 end
 
-local function update_enemy_hurt(o)
+function update_enemy_hurt(o)
  update_obj_ani(o,sprs.enemy.knocked)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
@@ -1213,7 +1206,7 @@ local function update_enemy_hurt(o)
  end
 end
 
-start_enemy_hurt=function(o)
+function start_enemy_hurt(o)
  o.vx=0
  o.vy=enemyhurtvely
  o.desty=o.y
@@ -1225,7 +1218,7 @@ start_enemy_hurt=function(o)
  sfx(snds.expl2)
 end
 
-local function update_enemy_run(o)
+function update_enemy_run(o)
  if enemy_hit_objs(o) then
   return
  end
@@ -1252,7 +1245,7 @@ local function update_enemy_run(o)
  update_obj_ani(o,sprs.enemy.run)
 end
 
-start_enemy_run=function(o)
+function start_enemy_run(o)
  o.vx=o.flpx and -enemyrunspd
   or enemyrunspd
  o.vy=0
@@ -1260,7 +1253,7 @@ start_enemy_run=function(o)
  o.update=update_enemy_run
 end
 
-local function add_enemy()
+function add_enemy()
  local o=add_obj_spr{
   x=56,y=worldbtm-256,
   vx=0,vy=0,
@@ -1272,8 +1265,6 @@ local function add_enemy()
 end
 -->8
 --game phases
-local start_title,
- start_credits
 
 local stars={}
 for y=16,80,32 do
@@ -1290,7 +1281,7 @@ for y=120,128,8 do
  end
 end
 
-local function draw_sky()
+function draw_sky()
  pal()
  fillp(░)
  rectfill(0,104,128,108,1)
@@ -1308,20 +1299,20 @@ local function draw_sky()
  end
 end
 
-local function draw_credits()
+function draw_credits()
  cls()
  draw_sky()
  draw_objs()
 end
 
-local function update_credits()
+function update_credits()
  update_objs()
  if btnp(🅾️) then
   start_title()
  end
 end
 
-start_credits=function()
+function start_credits()
  camera()
  clear_game_objs()
  add_obj_text {
@@ -1361,7 +1352,7 @@ MUSIC
  _draw=draw_credits
 end
 
-local function update_game()
+function update_game()
  update_objs()
  cleanup_dead_objs()
  cleanup(enbombs,obj_dead)
@@ -1376,7 +1367,7 @@ local function update_game()
  end
 end
 
-local function draw_game()
+function draw_game()
  cls()
  draw_sky()
  camera(cam.x,cam.y)
@@ -1389,7 +1380,7 @@ local function draw_game()
  end
 end
 
-local function start_game()
+function start_game()
  cam.x=0
  cam.y=worldbtm-128
  clear_game_objs()
@@ -1402,7 +1393,7 @@ local function start_game()
  _draw=draw_game
 end
 
-local function update_title()
+function update_title()
  if btnp(🅾️) then
   start_game()
  elseif btnp(❎) then
@@ -1415,14 +1406,14 @@ local function update_title()
  end
 end
 
-local function draw_title()
+function draw_title()
  cls()
  draw_sky()
  draw_objs()
  draw_life(ninstartlife)
 end
 
-start_title=function()
+function start_title()
  reload(0x2000,0x2000,0x1000)
  pal()
  poke(0X5F5C, 0)
