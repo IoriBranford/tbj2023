@@ -887,6 +887,10 @@ function nin_try_jump(o,holdok)
  end
 end
 
+function nin_catch_allowed(o)
+ return not o.bomb and not o.dying
+  and not o.climbing
+end
 function nin_catch_box(o)
  local w,h=o.w<<3,o.h<<2
  return o.x,o.y-h,w,h
@@ -903,6 +907,27 @@ function nin_find_catch_bomb(o)
    return b,i
   end
  end
+end
+
+function nin_find_coming_bomb(o)
+ local bomb,dst=nil,0x7fff
+ local x,y,w,h=nin_catch_box(o)
+ local warnh=96
+ y,h=y-warnh,h+warnh
+ local heldbomb=o.bomb
+ for b in all(enbombs) do
+  if b~=heldbomb
+  and aabbs(x,y,w,h,
+   b.x,b.y,
+   b.w<<3,b.h<<3)
+  then
+   local d=y+warnh-b.y-(b.h<<3)
+   if d<dst then
+    bomb,dst=b,d
+   end
+  end
+ end
+ return bomb,dst
 end
 
 function nin_try_catch_bomb(o)
@@ -943,19 +968,24 @@ function update_nin_climb_ani(o)
 end
 
 function update_nin_climb(o)
+ o.climbing=true
  nin_hit_objs(o)
  if o.dying then
+  o.climbing=nil
   return
  end
  update_nin_invul(o)
  if nin_try_jump(o) then
   o.vx=nintoprunspd*dir_input_x()
+  o.climbing=nil
  else
   local collvy=nin_climb_y(o)
   if collvy<0 then
    o.update=update_nin_ground
+   o.climbing=nil
   elseif not obj_ladder(o) then
    o.update=update_nin_air
+   o.climbing=nil
   end
  end
  update_nin_climb_ani(o)
@@ -1048,6 +1078,30 @@ end
 function draw_ninja(o)
  if (o.invul or 0)%2==0 then
   draw_obj_spr(o)
+ end
+ if nin_catch_allowed(o)
+ or o.climbing then
+  local b,d=nin_find_coming_bomb(o)
+  if b then
+   d=max(0,d)
+   local x,y,w,h=nin_catch_box(o)
+   local clr,fp=5,░
+   if d<32 then
+    clr,fp=7,█
+   elseif d<64 then
+    clr,fp=6,▒
+   end
+   pal()
+   fillp(fp)
+   oval(x-(d<<1),y-d,x+w+(d<<1),y+h+d,clr)
+   if o.climbing then
+    print("⬅️",o.x-8,o.y+2,7)
+    print("➡️",o.x+8,o.y+2,7)
+   else
+    print("⬆️",x,y,clr)
+   end
+   fillp()
+  end
  end
 end
 
