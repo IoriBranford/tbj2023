@@ -891,11 +891,16 @@ local function nin_try_jump(o,holdok)
  end
 end
 
+local function nin_catch_box(o)
+ local w,h=o.w<<3,o.h<<2
+ return o.x,o.y-h,w,h
+end
+
 local function nin_find_catch_bomb(o)
- local x,y=o.x-4,o.y-4
+ local x,y,w,h=nin_catch_box(o)
  for i=1,#enbombs do
   local b=enbombs[i]
-  if aabbs(x,y,16,12,
+  if aabbs(x,y,w,h,
    b.x,b.y,
    b.w<<3,b.h<<3)
   then
