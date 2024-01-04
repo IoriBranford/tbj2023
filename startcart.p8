@@ -1162,6 +1162,7 @@ function start_enemy_shot(o)
  o.update=update_enemy_shot
  update_obj_ani(o,sprs.enemy.throw)
  local bomb=add_bomb({
+  target=ninja,
   x=o.x+(o.w<<1),
   y=o.y+(o.h<<1)
  },o.bombtmpl)
