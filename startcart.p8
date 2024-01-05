@@ -372,6 +372,9 @@ local sprs={
  puff={t=3,
   28,29,30,31
  },
+ splitpuff={t=3,pal={[6]=3},
+  28,29,30,31
+ },
  fbomb={t=6,
   34,{i=35,pal={[5]=10,[1]=9}}
  },
@@ -583,32 +586,36 @@ function draw_bomb(o)
 end
 
 function update_expl(o)
+ o.x=o.x+(o.vx or 0)
+ o.y=o.y+(o.vy or 0)
  update_obj_ani(o)
  if obj_ani_ending(o) then
   kill_obj(o)
  end
 end
 
+function add_puff(o)
+ add_obj_spr(o)
+ o.update=update_expl
+ return o
+end
+
 function add_expls(cx,cy)
- add_obj_spr {
+ add_puff {
   x=cx-8,y=cy-8,
   ani=sprs.expl.tl,
-  update=update_expl
  }
- add_obj_spr {
+ add_puff {
   x=cx,y=cy-8,
   ani=sprs.expl.tr,
-  update=update_expl
  }
- add_obj_spr {
+ add_puff {
   x=cx-8,y=cy,
   ani=sprs.expl.bl,
-  update=update_expl
  }
- add_obj_spr {
+ add_puff {
   x=cx,y=cy,
   ani=sprs.expl.br,
-  update=update_expl
  }
  add(expls, add_obj_spr {
   x=cx-4,y=cy-4,
@@ -650,6 +657,11 @@ function update_bomb_split_whole(o)
    x=o.x,y=o.y,
    vx=1,vy=0
   }, "splithalf"))
+  add_puff {
+   x=o.x,y=o.y,
+   vy=-.5,
+   ani=sprs.splitpuff
+  }
   kill_obj(o)
  end
  o.vy=vy
@@ -1221,7 +1233,7 @@ local enemyjumpvely=-4
 
 local enemylevels={
  [1]={
-  bombtmpl=bombtmpls.normal,
+  bombtmpl=bombtmpls.split,
   ladderdrops={32,88},
   taunt="          here, catch!          "
  },
