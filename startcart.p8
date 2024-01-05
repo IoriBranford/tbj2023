@@ -1070,6 +1070,7 @@ function nin_try_climb(o)
 end
 
 function update_nin_air(o)
+ nin_try_catch_bomb(o)
  nin_hit_objs(o)
  if o.dying then
   return
@@ -1077,7 +1078,6 @@ function update_nin_air(o)
  update_nin_invul(o)
  nin_drop_y(o)
  nin_move_x(o)
- nin_try_catch_bomb(o)
  o.jumpagain=o.jumpagain or btnp(🅾️)
  if nin_try_climb(o) then
  elseif obj_ground(o) then
