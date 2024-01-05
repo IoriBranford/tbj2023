@@ -1471,6 +1471,7 @@ function update_game()
  update_objs()
  cleanup_dead_objs()
  cleanup(enbombs,obj_dead)
+ cleanup(ninbombs,obj_dead)
  cleanup(expls,obj_dead)
 
  if obj_dead(ninja) then
