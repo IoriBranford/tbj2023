@@ -537,7 +537,9 @@ function add_rooms()
 end
 -->8
 --bombs
-
+local splitbombwholegrav=-1/16
+local splitbombhalfgrav=1/16
+local splitbombmaxvely=1.5
 local fusecolors={8,14,7}
 
 function draw_bomb(o)
@@ -604,6 +606,50 @@ function update_bomb_normal(o)
  update_obj_ani(o)
 end
 
+function update_bomb_split_whole(o)
+ local bombs,ay=enbombs,splitbombwholegrav
+ if o.target==enemy then
+  bombs,ay=ninbombs,-ay
+ end
+ local vy=o.vy
+ vy=ay<0
+  and max(0,vy+ay)
+  or min(0,vy+ay)
+ if vy==0 then
+  add(bombs,add_bomb({
+   x=o.x,y=o.y,
+   vx=-1,vy=0
+  }, "splithalf"))
+  add(bombs,add_bomb({
+   x=o.x,y=o.y,
+   vx=1,vy=0
+  }, "splithalf"))
+  kill_obj(o)
+ end
+ o.vy=vy
+ o.x,o.y=o.x+o.vx,o.y+vy
+ update_obj_ani(o)
+end
+
+function update_bomb_split_half(o)
+ local vx,vy=o.vx,o.vy
+ if vx<0 then
+  vx=min(0,vx+.0625)
+ elseif vx>0 then
+  vx=max(0,vx-.0625)
+ end
+ local ay=o.target==enemy
+  and -splitbombhalfgrav
+  or splitbombhalfgrav
+ vy=min(vy+ay,splitbombmaxvely)
+ o.vx,o.vy=vx,vy
+ o.x,o.y=o.x+vx,o.y+vy
+ update_obj_ani(o)
+ if obj_ground(o) then
+  bomb_explode(o)
+ end
+end
+
 function update_bomb_fuse(o)
  o.fuse=o.fuse-1
  if o.fuse<=0 then
@@ -632,6 +678,17 @@ local bombtmpls={
   vx=0,vy=1.5,
   ani=sprs.bomb.normal,
   update=update_bomb_normal,
+ },
+ split={
+  fuse=180,
+  vx=0,vy=2,
+  ani=sprs.bomb.split,
+  update=update_bomb_split_whole,
+ },
+ splithalf={
+  fuse=180,
+  ani=sprs.bomb.split,
+  update=update_bomb_split_half,
  }
 }
 
@@ -1136,7 +1193,7 @@ local enemyjumpvely=-4
 
 local enemylevels={
  {bombtmpl=bombtmpls.normal,ladderdrops={32,88}},
- {bombtmpl=bombtmpls.normal,},
+ {bombtmpl=bombtmpls.split,},
 }
 
 function enemy_hit_objs(o)
