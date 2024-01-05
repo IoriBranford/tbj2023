@@ -645,7 +645,9 @@ function update_bomb_split_half(o)
  o.vx,o.vy=vx,vy
  o.x,o.y=o.x+vx,o.y+vy
  update_obj_ani(o)
- if obj_ground(o) then
+ local gy=obj_ground(o)
+ if gy then
+  o.y=gy-(o.h<<2)
   bomb_explode(o)
  end
 end
