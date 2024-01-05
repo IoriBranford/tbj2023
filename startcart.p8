@@ -1194,8 +1194,15 @@ local enemyhurttime=60
 local enemyjumpvely=-4
 
 local enemylevels={
- {bombtmpl=bombtmpls.normal,ladderdrops={32,88}},
- {bombtmpl=bombtmpls.split,},
+ [1]={
+  bombtmpl=bombtmpls.normal,
+  ladderdrops={32,88},
+  taunt="          here, catch!          "
+ },
+ [2]={
+  bombtmpl=bombtmpls.split,
+  taunt="         seeing double?!        "
+ },
 }
 
 function enemy_hit_objs(o)
@@ -1323,6 +1330,25 @@ function update_enemy_hurt(o)
  end
 end
 
+function enemy_say_taunt(o)
+ local taunt=o.taunt
+ if taunt then
+  o.taunt=nil
+  add_obj_text {
+   text=taunt,
+   x=0,y=16,
+   clr=8,
+   update=function(o)
+    o.x=cam.x
+    o.y=cam.y+24
+    if o.age>=180 then
+     kill_obj(o)
+    end
+   end
+  }
+ end
+end
+
 function start_enemy_hurt(o)
  o.vx=0
  o.vy=enemyhurtvely
@@ -1339,12 +1365,14 @@ function update_enemy_run(o)
  if enemy_hit_objs(o) then
   return
  end
- if o.readytofire
- and ninja.y<o.y+128
- and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
- then
-  start_enemy_shot(o)
-  return
+ if ninja.y<o.y+128 then
+  enemy_say_taunt(o)
+  if o.readytofire
+  and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
+  then
+   start_enemy_shot(o)
+   return
+  end
  end
  local x=o.x+o.vx
  if x>=112 then
