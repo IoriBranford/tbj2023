@@ -1034,13 +1034,13 @@ function update_nin_air(o)
 end
 
 function update_nin_ground(o)
+ nin_try_catch_bomb(o)
  nin_hit_objs(o)
  if o.dying then
   return
  end
  update_nin_invul(o)
  nin_move_x(o)
- nin_try_catch_bomb(o)
  if nin_try_climb(o) then
  elseif nin_try_jump(o) then
  else
