@@ -600,7 +600,7 @@ function add_puff(o)
  return o
 end
 
-function add_expls(cx,cy)
+function add_normal_expl(cx,cy)
  add_puff {
   x=cx-8,y=cy-8,
   ani=sprs.expl.tl,
@@ -625,7 +625,7 @@ function add_expls(cx,cy)
 end
 
 function bomb_explode(o)
- add_expls(o.x+(o.w<<2),
+ o.addexpl(o.x+(o.w<<2),
   o.y+(o.h<<2))
  kill_obj(o)
 end
@@ -744,6 +744,8 @@ function add_bomb(o,tmpl)
  add_obj_spr(o)
  o.draw=draw_bomb
  o.fuse=-o.fuse
+ o.addexpl=o.addexpl
+  or add_normal_expl
  return o
 end
 
@@ -1335,7 +1337,7 @@ function update_enemy_dying(o)
  o.dyingtime=i
  if i<=300 then
   if i%6==0 then
-   add_expls(o.x+rnd(16),o.y+rnd(16))
+   add_normal_expl(o.x+rnd(16),o.y+rnd(16))
   end
   if i==300 then
    hazeptn=░
