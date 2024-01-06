@@ -1239,7 +1239,7 @@ local enemylevels={
  },
  [2]={
   bombtmpl=bombtmpls.split,
-  taunt="         seeing double?!        "
+  taunt="        double your pain!       "
  },
 }
 
