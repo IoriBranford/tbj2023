@@ -1310,6 +1310,7 @@ function update_enemy_jump(o)
  if o.y<=o.desty then
   o.y=o.desty
   o.laddery=nil
+  set_enemy_level(o,o.level+1)
   start_enemy_run(o)
  end
 end
@@ -1321,7 +1322,6 @@ function start_enemy_jump(o)
 end
 
 function update_enemy_getup(o)
- set_enemy_level(o,o.level+1)
  update_obj_ani(o,sprs.enemy.getup)
  if obj_ani_ending(o) then
   start_enemy_jump(o)
