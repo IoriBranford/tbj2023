@@ -1000,7 +1000,8 @@ function nin_find_catch_bomb(o)
  local x,y,w,h=nin_catch_box(o)
  for i=1,#enbombs do
   local b=enbombs[i]
-  if aabbs(x,y,w,h,
+  if not b.cantcatch
+  and aabbs(x,y,w,h,
    b.x,b.y,
    b.w<<3,b.h<<3)
   then
@@ -1017,6 +1018,7 @@ function nin_find_coming_bomb(o)
  local heldbomb=o.bomb
  for b in all(enbombs) do
   if b~=heldbomb
+  and not b.cantcatch
   and aabbs(x,y,w,h,
    b.x,b.y,
    b.w<<3,b.h<<3)
