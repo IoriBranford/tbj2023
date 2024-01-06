@@ -378,11 +378,16 @@ local sprs={
  fbomb={t=6,
   34,{i=35,pal={[5]=10,[1]=9}}
  },
- fwall={t=3,
+ flame={t=3,
   36,37,38,39
  },
- fwallexpl={t=3,
-  80,81,82,83,84
+ flameexpl={
+  _base=80,
+  right={0,1,2,3,4,t=3},
+  left={0,1,2,3,4,t=3,flpx=true},
+ },
+ flamepuff={t=3,pal={[6]=9,[5]=8},
+  28,29,30,31
  },
  enemyskull={
   _base=88,
@@ -568,6 +573,8 @@ end
 --bombs
 local splitbombwholegrav=-1/16
 local splitbombhalfgrav=1/16
+local fwallgrav=-1/16
+local flamegrav=-1/32
 local splitbombmaxvely=1.5
 local fusecolors={8,14,7}
 
@@ -620,6 +627,26 @@ function add_normal_expl(cx,cy)
  add(expls, add_obj_spr {
   x=cx-4,y=cy-4,
   ani=sprs.expl.ctr,
+  update=update_expl
+ })
+end
+
+function add_flame_puffs(cx,cy)
+ add_puff {
+  x=cx-8,y=cy-8,
+  ani=sprs.flameexpl.left,
+ }
+ add_puff {
+  x=cx,y=cy-8,
+  ani=sprs.flameexpl.right,
+ }
+end
+
+function add_flame_expl(cx,cy)
+ add_flame_puffs(cx,cy)
+ add(expls, add_obj_spr {
+  x=cx-4,y=cy-4,
+  ani=sprs.flamepuff,
   update=update_expl
  })
 end
@@ -690,6 +717,64 @@ function update_bomb_split_half(o)
  end
 end
 
+function update_fwall_bomb(o)
+ local bombs,ay=enbombs,splitbombwholegrav
+ if o.target==enemy then
+  bombs,ay=ninbombs,-ay
+ end
+ local vy=o.vy
+ vy=ay<0
+  and max(0,vy+ay)
+  or min(0,vy+ay)
+ if vy==0 then
+  for vx=1,2 do
+   add(bombs,add_bomb({
+    x=o.x,y=o.y,
+    vx=vx,vy=2
+   }, "flame"))
+   add(bombs,add_bomb({
+    x=o.x,y=o.y,
+    vx=-vx,vy=2
+   }, "flame"))
+  end
+  add_puff {
+   x=o.x,y=o.y,
+   vy=-.5,
+   ani=sprs.flamepuff
+  }
+  kill_obj(o)
+ end
+ o.vy=vy
+ o.x,o.y=o.x+o.vx,o.y+vy
+ update_obj_ani(o)
+end
+
+function update_fwall_flame(o)
+ local vx,vy=o.vx,o.vy
+ if vx<0 then
+  vx=min(0,vx+.0625)
+ elseif vx>0 then
+  vx=max(0,vx-.0625)
+ end
+ local ay=o.target==enemy
+  and -flamegrav
+  or flamegrav
+ if ay<0 then
+  vy=max(vy+ay,0)
+ else
+  vy=min(vy+ay,0)
+ end
+ o.vx,o.vy=vx,vy
+ o.x,o.y=o.x+vx,o.y+vy
+ update_obj_ani(o)
+ if vy==0 then
+  add_flame_puffs(
+   o.x+(o.w<<2),
+   o.y+(o.h<<2))
+  kill_obj(o)
+ end
+end
+
 function update_bomb_fuse(o)
  o.fuse=o.fuse-1
  if o.fuse<=0 then
@@ -729,6 +814,20 @@ local bombtmpls={
   fuse=180,
   ani=sprs.bomb.split,
   update=update_bomb_split_half,
+ },
+ fwall={
+  fuse=180,
+  vx=0,vy=2,
+  ani=sprs.bomb.fwall,
+  update=update_fwall_bomb,
+ },
+ flame={
+  h=2,
+  fuse=0,
+  cantcatch=true,
+  ani=sprs.flame,
+  addexpl=add_flame_expl,
+  update=update_fwall_flame,
  }
 }
 
@@ -1237,13 +1336,18 @@ local enemyjumpvely=-4
 
 local enemylevels={
  [1]={
-  bombtmpl=bombtmpls.split,
+  bombtmpl=bombtmpls.normal,
   ladderdrops={32,88},
   taunt="          here, catch!          "
  },
  [2]={
   bombtmpl=bombtmpls.split,
+  ladderdrops={24},
   taunt="        double your pain!       "
+ },
+ [3]={
+  bombtmpl=bombtmpls.fwall,
+  taunt="          you're toast!         "
  },
 }
 
