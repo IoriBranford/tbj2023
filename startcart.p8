@@ -718,19 +718,23 @@ function update_bomb_split_half(o)
 end
 
 function update_fwall_bomb(o)
- local bombs,ay=enbombs,splitbombwholegrav
+ local bombs,ay=enbombs,fwallgrav
  if o.target==enemy then
   bombs,ay=ninbombs,-ay
  end
  local vy=o.vy
  vy=ay<0
-  and max(0,vy+ay)
-  or min(0,vy+ay)
- if vy==0 then
+  and max(.25,vy+ay)
+  or min(-.25,vy+ay)
+ o.dist=(o.dist or 0)+abs(vy)
+ if o.dist>=32 then
   for vx=-2,2 do
    add(bombs,add_bomb({
+    target=o.target,
     x=o.x,y=o.y,
-    vx=vx,vy=2,
+    vx=vx,
+    vy=o.target==enemy
+     and -1.5 or 1.5,
     ax=vx*-.0625
    }, "flame"))
   end
@@ -757,14 +761,15 @@ function update_fwall_flame(o)
   and -flamegrav
   or flamegrav
  if ay<0 then
-  vy=max(vy+ay,0)
+  vy=max(vy+ay,1)
  else
-  vy=min(vy+ay,0)
+  vy=min(vy+ay,-1)
  end
+ o.dist=(o.dist or 0)+abs(vy)
  o.vx,o.vy=vx,vy
  o.x,o.y=o.x+vx,o.y+vy
  update_obj_ani(o)
- if vy==0 then
+ if o.dist>=80 then
   add_flame_puffs(
    o.x+(o.w<<2),
    o.y+(o.h<<2))
@@ -792,6 +797,7 @@ function start_bomb_thrown(o)
  o.fuse=-1
  o.target=enemy
  o.flpy=true
+ o.dist=nil
 end
 
 local bombtmpls={
@@ -814,7 +820,7 @@ local bombtmpls={
  },
  fwall={
   fuse=180,
-  vx=0,vy=2,
+  vx=0,vy=1.5,
   ani=sprs.bomb.fwall,
   update=update_fwall_bomb,
  },
