@@ -1541,13 +1541,14 @@ function start_enemy_run(o)
  o.update=update_enemy_run
 end
 
-function add_enemy()
+function add_enemy(lvl)
+ lvl=lvl or 1
  local o=add_obj_spr{
-  x=56,y=worldbtm-256,
+  x=56,y=worldbtm-128*(1+lvl),
   vx=0,vy=0,
   w=2,h=2,
  }
- set_enemy_level(o,1)
+ set_enemy_level(o,lvl)
  start_enemy_run(o)
  return o
 end
@@ -1670,11 +1671,15 @@ function draw_game()
 end
 
 function start_game()
+ local lvl
  cam.x=0
  cam.y=worldbtm-128
+ if lvl then
+  cam.y=cam.y-128*lvl
+ end
  clear_game_objs()
  add_rooms()
- enemy=add_enemy()
+ enemy=add_enemy(lvl)
  ninja=add_ninja()
  poke(0X5F5C, 255)
  music(snds.gamemus)
