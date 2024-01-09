@@ -587,6 +587,7 @@ local splitbombwholegrav=-1/16
 local splitbombhalfgrav=1/16
 local fwallgrav=-1/32
 local flamegrav=-1/32
+local fbombexpldist=16
 local splitbombmaxvely=1.5
 local fusecolors={8,14,7}
 
@@ -784,6 +785,57 @@ function update_fwall_flame(o)
  end
 end
 
+function update_fbomb_expls(o)
+ if o.age%6==0 then
+  local dist=(o.expldist or 0)+4
+  o.expldist=dist
+  local cx,cy=
+   o.x+(o.w<<2),
+   o.y+(o.h<<2)
+  for dy=-1,1,2 do
+   for dx=-1,1,2 do
+    add(expls,add_normal_expl(
+     cx+dx*dist,cy+dy*dist
+    ))
+   end
+  end
+ end
+ if o.age>=30 then
+  kill_obj(o)
+ end
+end
+
+function update_fbomb_preexpl(o)
+ update_obj_ani(o)
+ o.x,o.y=o.x+o.vx,o.y+o.vy
+ local t=(o.t or 30)-1
+ o.t=t
+ if t<=0 then
+  bomb_explode(o)
+  add_obj({
+   x=o.x,y=o.y,
+   w=o.w,h=o.h,
+   update=update_fbomb_expls
+  })
+ end
+end
+
+function update_fbomb_fall(o)
+ update_obj_ani(o)
+ if o.x<8 then
+  o.vx=abs(o.vx)
+ elseif o.x>112 then
+  o.vx=-abs(o.vx)
+ end
+ o.x,o.y=o.x+o.vx,o.y+o.vy
+ local tx,ty=o.target.x,o.target.y
+ if abs(tx-o.x)<fbombexpldist
+ and abs(ty-o.y)<fbombexpldist then
+  o.vx,o.vy=0,0
+  o.update=update_fbomb_preexpl
+ end
+end
+
 function update_bomb_fuse(o)
  o.fuse=o.fuse-1
  if o.fuse<=0 then
@@ -838,6 +890,13 @@ local bombtmpls={
   ani=sprs.flame,
   addexpl=add_flame_expl,
   update=update_fwall_flame,
+ },
+ fbomb={
+  fuse=180,
+  vx=1.5,vy=1.5,
+  ani=sprs.fbomb,
+  update=update_fbomb_fall,
+  updateonthrow=update_fbomb_fall,
  }
 }
 
@@ -1360,6 +1419,11 @@ local enemylevels={
   ladderdrops={104},
   taunt="          you're toast!         "
  },
+ [4]={
+  bombtmpl=bombtmpls.fbomb,
+  firedistx=32,
+  taunt="       x marks your grave!      "
+ }
 }
 
 function enemy_hit_objs(o)
