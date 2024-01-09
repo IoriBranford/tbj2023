@@ -1387,12 +1387,15 @@ function start_enemy_shot(o)
  o.readytofire=nil
  o.update=update_enemy_shot
  update_obj_ani(o,sprs.enemy.throw)
- local bomb=add_bomb({
+ local b=add_bomb({
   target=ninja,
   x=o.x+(o.w<<1),
   y=o.y+(o.h<<1)
  },o.bombtmpl)
- add(enbombs,bomb)
+ if o.flpx and b.vx then
+  b.vx=-b.vx
+ end
+ add(enbombs,b)
 end
 
 function set_enemy_level(o,l)
