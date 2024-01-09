@@ -569,6 +569,15 @@ function add_rooms()
   })
  end
 end
+
+function obj_fall_out_y(o)
+ if o.y<0
+  and o.y+(o.w<<3)<cam.y
+  or o.y>cam.y+128 then
+  kill_obj(o)
+ end
+end
+
 -->8
 --bombs
 local splitbombwholegrav=-1/16
@@ -659,11 +668,8 @@ end
 
 function update_bomb_normal(o)
  o.y=o.y+o.vy
- if o.y>cam.y+128
- or o.x+(o.w<<3)<cam.x then
-  kill_obj(o)
- end
  update_obj_ani(o)
+ obj_fall_out_y(o)
 end
 
 function update_bomb_split_whole(o)
@@ -694,6 +700,7 @@ function update_bomb_split_whole(o)
  o.vy=vy
  o.x,o.y=o.x+o.vx,o.y+vy
  update_obj_ani(o)
+ obj_fall_out_y(o)
 end
 
 function update_bomb_split_half(o)
@@ -710,11 +717,7 @@ function update_bomb_split_half(o)
  o.vx,o.vy=vx,vy
  o.x,o.y=o.x+vx,o.y+vy
  update_obj_ani(o)
- local gy=obj_ground(o)
- if gy then
-  o.y=gy-(o.h<<2)
-  bomb_explode(o)
- end
+ obj_fall_out_y(o)
 end
 
 function update_fwall_bomb(o)
@@ -748,6 +751,7 @@ function update_fwall_bomb(o)
  o.vy=vy
  o.x,o.y=o.x+o.vx,o.y+vy
  update_obj_ani(o)
+ obj_fall_out_y(o)
 end
 
 function update_fwall_flame(o)
