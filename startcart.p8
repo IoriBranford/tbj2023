@@ -794,7 +794,7 @@ end
 
 function start_bomb_fuse(o)
  o.fuse=abs(o.fuse)
- o.updateonthrow=o.update
+ o.updateonthrow=o.updateonthrow or o.update
  o.update=update_bomb_fuse
 end
 
