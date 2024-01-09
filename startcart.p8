@@ -1527,11 +1527,15 @@ function update_enemy_run(o)
  end
  if ninja.y<o.y+128 then
   enemy_say_taunt(o)
-  if o.readytofire
-  and abs(ninja.x+(ninja.w<<2)-(o.x+(o.w<<2)))<2
-  then
-   start_enemy_shot(o)
-   return
+  if o.readytofire then
+   local firedistx=o.firedistx or 2
+   local distx=abs(
+    ninja.x+(ninja.w<<2)
+    -(o.x+(o.w<<2)))
+   if distx<firedistx then
+    start_enemy_shot(o)
+    return
+   end
   end
  end
  local x=o.x+o.vx
