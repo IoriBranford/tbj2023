@@ -830,7 +830,8 @@ function update_fbomb_fall(o)
  end
  o.x,o.y=o.x+o.vx,o.y+o.vy
  local tx,ty=o.target.x,o.target.y
- if abs(tx-o.x)<fbombexpldist
+ if not o.target.dying
+ and abs(tx-o.x)<fbombexpldist
  and abs(ty-o.y)<fbombexpldist then
   o.vx,o.vy=0,0
   o.update=update_fbomb_preexpl
