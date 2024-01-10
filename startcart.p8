@@ -254,7 +254,9 @@ function add_obj_spr(o)
  add_obj(o)
  o.w=o.w or 1
  o.h=o.h or 1
- o.draw=draw_obj_spr 
+ if (o.draw or nop)==nop then
+  o.draw=draw_obj_spr
+ end
  if o.ani then
   start_obj_ani(o,o.ani,o.fi)
  end
