@@ -97,6 +97,7 @@ end
 local objs={}
 
 function draw_obj_text(o)
+ pal()
  local text=o.text
  local typ=type(text)
  if typ=="table" then
