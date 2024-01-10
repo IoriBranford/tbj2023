@@ -1457,7 +1457,7 @@ function update_enemy_shot(o)
   start_enemy_run(o)
   return
  end
- update_obj_ani(o,sprs.enemy.throw)
+ update_obj_ani(o,o.sprset.throw)
 end
 
 function start_enemy_shot(o)
@@ -1465,7 +1465,7 @@ function start_enemy_shot(o)
  o.vy=0
  o.readytofire=nil
  o.update=update_enemy_shot
- update_obj_ani(o,sprs.enemy.throw)
+ update_obj_ani(o,o.sprset.throw)
  local b=add_bomb({
   target=ninja,
   x=o.x+(o.w<<1),
@@ -1507,7 +1507,7 @@ function update_enemy_jump(o)
   o.laddery=ly+8
  end
  o.y=o.y+o.vy
- update_obj_ani(o,sprs.enemy.jump)
+ update_obj_ani(o,o.sprset.jump)
  if o.y<=o.desty then
   o.y=o.desty
   o.laddery=nil
@@ -1523,13 +1523,14 @@ function start_enemy_jump(o)
 end
 
 function update_enemy_getup(o)
- update_obj_ani(o,sprs.enemy.getup)
+ update_obj_ani(o,o.sprset.getup)
  if obj_ani_ending(o) then
   start_enemy_jump(o)
  end
 end
 
 function update_enemy_dying(o)
+ update_obj_ani(o)
  local i=(o.dyingtime or 0)+1
  o.dyingtime=i
  if i<=300 then
@@ -1549,8 +1550,32 @@ function update_enemy_dying(o)
  end
 end
 
+function enemy_change(o)
+ add_obj_spr({
+  x=o.x,y=o.y,
+  w=o.w,h=o.h,
+  flpx=o.flpx,
+  ani=o.ani,
+  draw=function(o)
+   fillp((o.age<=20
+    and ▒ or ░)
+    +0b.01)
+   draw_obj_spr(o)
+   fillp()
+  end,
+  update=function(o)
+   update_obj_ani(o)
+   o.y=o.y-.5
+   if o.age>40 then
+    kill_obj(o)
+   end
+  end
+ })
+ o.sprset=sprs.enemyskull
+end
+
 function update_enemy_hurt(o)
- update_obj_ani(o,sprs.enemy.knocked)
+ update_obj_ani(o,o.sprset.knocked)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
  if o.y>=o.desty then
@@ -1561,6 +1586,9 @@ function update_enemy_hurt(o)
    o.time=nil
    o.desty=nil
    if o.level<#enemylevels then
+    if o.level+1==#enemylevels then
+     enemy_change(o)
+    end
     o.update=update_enemy_getup
     local mus=enemylevels[o.level+1].music
     if mus then
@@ -1637,7 +1665,7 @@ function update_enemy_run(o)
   o.x=x
  end
  o.flpx=o.vx<0
- update_obj_ani(o,sprs.enemy.run)
+ update_obj_ani(o,o.sprset.run)
 end
 
 function start_enemy_run(o)
@@ -1654,6 +1682,7 @@ function add_enemy(lvl)
   x=56,y=mapbtm-128*(1+lvl),
   vx=0,vy=0,
   w=2,h=2,
+  sprset=sprs.enemy
  }
  set_enemy_level(o,lvl)
  start_enemy_run(o)
