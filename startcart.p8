@@ -497,7 +497,8 @@ local rooms={ --<y,{celx,cely}>
  [512]={32,0},
  [640]={32,16},
 }
-local worldbtm=768
+local mapbtm=768
+local worldbtm=mapbtm+32
 
 function clear_game_objs()
  clear_objs()
@@ -958,7 +959,7 @@ local ningrav=1/8
 local ninclimbaccel=.5
 local nintopclimbspd=1.5
 local ninjumpvely=-2
-local ninjumpinvely=-2.5
+local ninjumpinvely=-3
 local ninblownoutvely=-3
 local ninthrowbombvely=-4
 local nininvul=180
@@ -1036,7 +1037,7 @@ function nin_coll_vy(x,y,w,h,vy)
   edge=y
   cmp=max
  elseif vy>0 then
-  bnd=worldbtm
+  bnd=mapbtm
   edge=y+h
   cmp=min
  else
@@ -1644,7 +1645,7 @@ end
 function add_enemy(lvl)
  lvl=lvl or 1
  local o=add_obj_spr{
-  x=56,y=worldbtm-128*(1+lvl),
+  x=56,y=mapbtm-128*(1+lvl),
   vx=0,vy=0,
   w=2,h=2,
  }
