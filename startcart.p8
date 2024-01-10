@@ -1341,7 +1341,6 @@ function update_nin_jumpin(o)
 end
 
 function start_nin_jumpin(o)
- o.x=60
  o.y=cam.y+128
  o.vx=0
  o.vy=ninjumpinvely
@@ -1381,6 +1380,7 @@ end
 
 function add_ninja()
  local o=add_obj_spr {
+  x=60,
   life=ninstartlife
  }
  o.draw=draw_ninja
