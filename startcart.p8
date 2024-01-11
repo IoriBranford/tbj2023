@@ -510,7 +510,7 @@ local rooms={ --<y,{celx,cely}>
  [640]={32,16},
 }
 local mapbtm=768
-local worldbtm=mapbtm+32
+local worldbtm=mapbtm+88
 
 function clear_game_objs()
  clear_objs()
@@ -1008,6 +1008,7 @@ function update_nin_death(o)
  if o.y>cam.y+128 then
   if o.life>0 then
    o.dying=nil
+   o.y=cam.y+128
    start_nin_jumpin(o)
   else
    sfx(-1)
@@ -1354,11 +1355,48 @@ function update_nin_jumpin(o)
 end
 
 function start_nin_jumpin(o)
- o.y=cam.y+128
  o.vx=0
  o.vy=ninjumpinvely
  o.invul=nininvul
  o.update=update_nin_jumpin
+end
+
+function update_plane_flyin(o)
+ o.vx=o.vx+o.ax
+ o.vy=o.vy+o.ay
+ o.x=o.x+o.vx
+ o.y=o.y+o.vy
+ if o.nin then
+  o.nin.x=o.x+4
+  o.nin.y=o.y-4
+  -- cam_on_nin(o.nin)
+ end
+ if o.vy>=0 then
+  o.ax=abs(o.ax)
+  if o.nin then
+   start_nin_jumpin(o.nin)
+   o.nin=nil
+  end
+ end
+ if o.x>128 then
+  kill_obj(o)
+ end
+ update_obj_ani(o,
+  o.vy<-1 and sprs.plane.up
+  or o.vy>1 and sprs.plane.down
+  or sprs.plane.fwd)
+end
+
+function add_plane()
+ return add_obj_spr {
+  ani=sprs.plane.up,
+  x=-16,y=cam.y+88,
+  w=2,h=2,
+  vx=2.5,vy=-2,
+  ax=-1/32,ay=.0625,
+  nin=ninja,
+  update=update_plane_flyin
+ }
 end
 
 function draw_ninja(o)
@@ -1392,13 +1430,12 @@ function draw_ninja(o)
 end
 
 function add_ninja()
- local o=add_obj_spr {
-  x=60,
-  life=ninstartlife
+ return add_obj_spr {
+  x=-8,y=worldbtm-8,
+  ani=sprs.ninja.duck,
+  life=ninstartlife,
+  draw=draw_ninja
  }
- o.draw=draw_ninja
- start_nin_jumpin(o)
- return o
 end
 
 function draw_life(life)
@@ -1823,6 +1860,7 @@ function start_game()
  add_rooms()
  enemy=add_enemy(lvl)
  ninja=add_ninja()
+ add_plane()
  poke(0X5F5C, 255)
  music(snds.gamemus)
  _update60=update_game
