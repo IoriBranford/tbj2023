@@ -484,7 +484,13 @@ local sprs={
   },
   getup={i=46,t=30,sfx=snds.engetup},
  },
- ladder=189
+ ladder=189,
+ plane={
+  _base=1,
+  fwd=0,
+  down=2,
+  up=4
+ }
 }
 apply_sprs_bases(sprs)
 -->8
