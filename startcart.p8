@@ -1677,13 +1677,13 @@ end
 
 function enemy_try_fire(o)
  if ninja.y<o.y+128
- and o.readytofire then
+ and o.readytofire
+ and o.y==o.floory then
   local firedistx=o.firedistx or 2
-  local distx=abs(
-   ninja.x+(ninja.w<<2)
-   -(o.x+(o.w<<2)))
-  if distx<firedistx
-  and o.y==o.floory then
+  local dx=ninja.x+(ninja.w<<2)
+   -(o.x+(o.w<<2))
+  if abs(dx)<firedistx then
+   o.flpx=dx<0
    start_enemy_shot(o)
    return true
   end
@@ -1895,7 +1895,7 @@ function draw_game()
 end
 
 function start_game()
- local lvl=nil
+ local lvl=4
  cam.x=0
  cam.y=worldbtm-128
  if lvl then
