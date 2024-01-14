@@ -1451,38 +1451,11 @@ end
 --enemy
 
 local enemyrunspd=2
+local enemyhopvely=-2
+local enemyhopgrav=1/32
 local enemyhurtvely=-2
 local enemyhurttime=60
 local enemyjumpvely=-4
-
-local enemylevels={
- [1]={
-  bombtmpl=bombtmpls.normal,
-  ladderdrops={32,88},
-  taunt="          here, catch!          "
- },
- [2]={
-  bombtmpl=bombtmpls.split,
-  ladderdrops={24},
-  taunt="        double your pain!       "
- },
- [3]={
-  bombtmpl=bombtmpls.fwall,
-  ladderdrops={104},
-  taunt="          you're toast!         "
- },
- [4]={
-  bombtmpl=bombtmpls.fbomb,
-  firedistx=32,
-  ladderdrops={16,32,48,72,88,104},
-  taunt="       x marks your grave!      "
- },
- [5]={
-  music=snds.finalmus,
-  bombtmpl=bombtmpls.fbomb,
-  firedistx=32,
- }
-}
 
 function enemy_hit_objs(o)
  obj_explode_bombs(o,ninbombs)
@@ -1497,7 +1470,7 @@ function update_enemy_shot(o)
   return
  end
  if obj_ani_ending(o) then
-  start_enemy_run(o)
+  start_enemy_move(o)
   return
  end
  update_obj_ani(o,o.sprset.throw)
@@ -1551,17 +1524,17 @@ function update_enemy_jump(o)
  end
  o.y=o.y+o.vy
  update_obj_ani(o,o.sprset.jump)
- if o.y<=o.desty then
-  o.y=o.desty
+ if o.y<=o.floory then
+  o.y=o.floory
   o.laddery=nil
   set_enemy_level(o,o.level+1)
-  start_enemy_run(o)
+  start_enemy_move(o)
  end
 end
 
 function start_enemy_jump(o)
  o.vy=enemyjumpvely
- o.desty=o.y-128
+ o.floory=o.y-128
  o.update=update_enemy_jump
 end
 
@@ -1621,13 +1594,12 @@ function update_enemy_hurt(o)
  update_obj_ani(o,o.sprset.knocked)
  o.vy=o.vy+ningrav
  o.y=o.y+o.vy
- if o.y>=o.desty then
-  o.y=o.desty
+ if o.y>=o.floory then
+  o.y=o.floory
   local time=o.time or 0
   time=time+1
   if time>enemyhurttime then
    o.time=nil
-   o.desty=nil
    if o.level<#enemylevels then
     if o.level+1==#enemylevels then
      enemy_change(o)
@@ -1668,7 +1640,6 @@ end
 function start_enemy_hurt(o)
  o.vx=0
  o.vy=enemyhurtvely
- o.desty=o.y
  o.update=update_enemy_hurt
  ninja.invul=180
  if o.level>=#enemylevels
@@ -1678,46 +1649,119 @@ function start_enemy_hurt(o)
  sfx(snds.expl2)
 end
 
-function update_enemy_run(o)
- if enemy_hit_objs(o) then
-  return
- end
- if ninja.y<o.y+128 then
-  enemy_say_taunt(o)
-  if o.readytofire then
-   local firedistx=o.firedistx or 2
-   local distx=abs(
-    ninja.x+(ninja.w<<2)
-    -(o.x+(o.w<<2)))
-   if distx<firedistx then
-    start_enemy_shot(o)
-    return
-   end
-  end
- end
+function enemy_move_x(o)
  local x=o.x+o.vx
- if x>=112 then
-  o.x=112
+ if x>=104 then
+  o.x=104
   o.vx=-o.vx
   o.readytofire=true
- elseif x<0 then
-  o.x=0
+ elseif x<8 then
+  o.x=8
   o.vx=-o.vx
   o.readytofire=true
  else
   o.x=x
  end
  o.flpx=o.vx<0
+end
+
+function enemy_hop_y(o)
+ local vy=o.vy+enemyhopgrav
+ local y=o.y+vy
+ if y>=o.floory then
+  y=o.floory
+  vy=enemyhopvely
+ end
+ o.y,o.vy=y,vy
+end
+
+function enemy_try_fire(o)
+ if ninja.y<o.y+128
+ and o.readytofire then
+  local firedistx=o.firedistx or 2
+  local distx=abs(
+   ninja.x+(ninja.w<<2)
+   -(o.x+(o.w<<2)))
+  if distx<firedistx
+  and o.y==o.floory then
+   start_enemy_shot(o)
+   return true
+  end
+ end
+end
+
+function update_enemy_hop(o)
+ if enemy_hit_objs(o) then
+  return
+ end
+ if ninja.y<o.floory+128 then
+  enemy_say_taunt(o)
+ end
+ if enemy_try_fire(o) then
+  return
+ end
+ enemy_move_x(o)
+ enemy_hop_y(o)
+ update_obj_ani(o,
+  o.vy<0 and o.sprset.jump
+  or o.sprset.drop)
+end
+
+function update_enemy_run(o)
+ if enemy_hit_objs(o) then
+  return
+ end
+ if ninja.y<o.y+128 then
+  enemy_say_taunt(o)
+ end
+ if enemy_try_fire(o) then
+  return
+ end
+ enemy_move_x(o)
  update_obj_ani(o,o.sprset.run)
 end
 
-function start_enemy_run(o)
+function start_enemy_move(o)
  o.vx=o.flpx and -enemyrunspd
   or enemyrunspd
  o.vy=0
  o.readytofire=nil
- o.update=update_enemy_run
+ o.update=o.movefunc or update_enemy_run
 end
+
+enemylevels={
+ [1]={
+  bombtmpl=bombtmpls.normal,
+  ladderdrops={32,88},
+  movefunc=update_enemy_run,
+  taunt="          here, catch!          "
+ },
+ [2]={
+  bombtmpl=bombtmpls.split,
+  ladderdrops={24},
+  movefunc=update_enemy_run,
+  taunt="        double your pain!       "
+ },
+ [3]={
+  bombtmpl=bombtmpls.fwall,
+  ladderdrops={104},
+  movefunc=update_enemy_run,
+  taunt="          you're toast!         "
+ },
+ [4]={
+  bombtmpl=bombtmpls.fbomb,
+  firedistx=128,
+  ladderdrops={16,32,48,72,88,104},
+  movefunc=update_enemy_hop,
+  taunt="       x marks your grave!      "
+ },
+ [5]={
+  music=snds.finalmus,
+  bombtmpl=bombtmpls.fbomb,
+  movefunc=update_enemy_run,
+  firedistx=32,
+ }
+}
 
 function add_enemy(lvl)
  lvl=lvl or 1
@@ -1727,8 +1771,9 @@ function add_enemy(lvl)
   w=2,h=2,
   sprset=sprs.enemy
  }
+ o.floory=o.y
  set_enemy_level(o,lvl)
- start_enemy_run(o)
+ start_enemy_move(o)
  return o
 end
 -->8
