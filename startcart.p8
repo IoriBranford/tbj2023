@@ -500,6 +500,10 @@ local sprs={
  }
 }
 apply_sprs_bases(sprs)
+
+local save={
+ besttime=0
+}
 -->8
 --game world
 local ninja,enemy,enbombs,ninbombs,expls
@@ -537,6 +541,21 @@ end
 
 function clock_pause(pause)
  clockpaused=pause
+end
+
+function clock_savebest()
+ local besttime=dget(save.besttime)
+ if clock<besttime then
+  dset(save.besttime,clock)
+ end
+end
+
+function clock_loadbest()
+ clock=dget(save.besttime)
+ if clock==0 then
+  clock=clocklimit
+  dset(save.besttime,clocklimit)
+ end
 end
 
 function room_cell(x,y)
@@ -1645,6 +1664,7 @@ function update_enemy_hurt(o)
      music(mus)
     end
    else
+    clock_savebest()
     o.update=update_enemy_dying
    end
   else
@@ -1971,6 +1991,8 @@ function draw_title()
  draw_sky()
  draw_objs()
  draw_life(ninstartlife)
+ print("best",80,123,7)
+ draw_clock()
 end
 
 function start_title()
@@ -1978,6 +2000,7 @@ function start_title()
  pal()
  poke(0X5F5C, 0)
  clear_game_objs()
+ clock_loadbest()
  camera()
  add_obj_text {
   x=8,y=48,
@@ -1995,7 +2018,10 @@ rise to the commander
  _draw=draw_title
 end
 
-_init=start_title
+function _init()
+ cartdata("rttcotwt")
+ start_title()
+end
 
 __gfx__
 000120000000000000000000000000000000000000000000000000000aaaaa000aaaaa00aa000aa00aaaaaa0099099000b0dd030777777674f9f4fff7999a999
