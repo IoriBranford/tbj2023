@@ -1796,12 +1796,14 @@ enemylevels={
  [2]={
   bombtmpl=bombtmpls.split,
   ladderdrops={24},
+  firedistx=4,
   movefunc=update_enemy_run,
   taunt="        double your pain!       "
  },
  [3]={
   bombtmpl=bombtmpls.fwall,
   ladderdrops={104},
+  firedistx=8,
   movefunc=update_enemy_run,
   taunt="          you're toast!         "
  },
