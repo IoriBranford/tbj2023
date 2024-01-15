@@ -98,6 +98,7 @@ local objs={}
 
 function draw_obj_text(o)
  pal()
+ fillp(o.fillp or █)
  local text=o.text
  local typ=type(text)
  if typ=="table" then
@@ -130,6 +131,7 @@ function draw_obj_sspr(o)
   sh=sh or ((o.h or 1)<<3)
   pal(o.pal)
   palt(o.palt or 0x8000)
+  fillp((o.fillp or █)|0b.01)
   sspr(sx or 0,sy or 0,
    sw,sh,
    o.x,o.y,
@@ -145,6 +147,7 @@ function draw_obj_spr(o)
  end
  pal(o.pal)
  palt(o.palt or 0x8000)
+ fillp((o.fillp or █)|0b.01)
  spr(o.spri,o.x,o.y,o.w,o.h,
   xor(o.flpx,o.frmflpx),
   xor(o.flpy,o.frmflpy))
@@ -153,6 +156,7 @@ end
 function draw_obj_map(o)
  pal(o.pal)
  palt(o.palt or 0x8000)
+ fillp((o.fillp or █)|0b.01)
  map(o.celx,o.cely,o.x,o.y,o.celw,o.celh,o.layer)
 end
 
@@ -185,7 +189,7 @@ function set_obj_frm(o,fi)
  local spri,ft,
   flpx,flpy,
   palt,pal,
-  snd
+  fillp,snd
  local typ=type(ani)
  if typ=="number" then
   spri=ani
@@ -199,6 +203,7 @@ function set_obj_frm(o,fi)
    flpy=xor(f.flpy,ani.flpy)
    palt=f.palt
    pal=f.pal
+   fillp=f.fillp
    snd=f.sfx
   else
    spri=typ=="number" and f
@@ -209,6 +214,7 @@ function set_obj_frm(o,fi)
   ft=ft or ani.t
   palt=palt or ani.palt
   pal=pal or ani.pal
+  fillp=fillp or ani.fillp
   snd=snd or ani.sfx
  end
  if snd then
@@ -221,6 +227,7 @@ function set_obj_frm(o,fi)
  o.frmflpy=flpy
  o.palt=palt
  o.pal=pal
+ o.fillp=fillp
 end
 
 function start_obj_ani(o,ani,fi)
@@ -1440,6 +1447,7 @@ end
 
 function draw_life(life)
  pal()
+ fillp()
  local y=121
  local x=0
  for i=1,life do
