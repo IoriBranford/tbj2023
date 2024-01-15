@@ -751,11 +751,11 @@ function update_bomb_split_whole(o)
  if vy==0 then
   add(bombs,add_bomb({
    x=o.x,y=o.y,
-   vx=-1,vy=0
+   vx=-.25,vy=-.25
   }, "splithalf"))
   add(bombs,add_bomb({
    x=o.x,y=o.y,
-   vx=1,vy=0
+   vx=.25,vy=-.25
   }, "splithalf"))
   add_puff {
    x=o.x,y=o.y,
@@ -772,11 +772,11 @@ end
 
 function update_bomb_split_half(o)
  local vx,vy=o.vx,o.vy
- if vx<0 then
-  vx=min(0,vx+.0625)
- elseif vx>0 then
-  vx=max(0,vx-.0625)
- end
+ -- if vx<0 then
+ --  vx=min(0,vx+.0625)
+ -- elseif vx>0 then
+ --  vx=max(0,vx-.0625)
+ -- end
  local ay=o.target==enemy
   and -splitbombhalfgrav
   or splitbombhalfgrav
