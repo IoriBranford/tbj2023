@@ -519,6 +519,9 @@ local rooms={ --<y,{celx,cely}>
 local mapbtm=768
 local worldbtm=mapbtm+88
 
+local clocklimit=60*60*9
+local clock,clockpaused
+
 function clear_game_objs()
  clear_objs()
  ninja=nil
@@ -528,6 +531,12 @@ function clear_game_objs()
  expls={}
  hazeclr=nil
  hazeptn=nil
+ clock=0
+ clockpaused=true
+end
+
+function clock_pause(pause)
+ clockpaused=pause
 end
 
 function room_cell(x,y)
@@ -1369,6 +1378,7 @@ function update_nin_jumpin(o)
  o.y=o.y+vy
  update_nin_air_ani(o)
  if o.vy>0 then
+  clock_pause(nil)
   o.update=update_nin_air
   return
  end
@@ -1468,6 +1478,21 @@ function draw_life(life)
   x=x+8
  end
 end
+
+function draw_clock()  
+ local f=clock%60
+ local s=flr(clock/60)%60
+ local m=flr(clock/3600)
+ if f<10 then
+  f="0"..f
+ end
+ if s<10 then
+  s="0"..s
+ end
+ pal()
+ fillp()
+ print(""..m..":"..s..":"..f,100,123,7)
+end
 -->8
 --enemy
 
@@ -1557,6 +1582,7 @@ function start_enemy_jump(o)
  o.vy=enemyjumpvely
  o.floory=o.y-128
  o.update=update_enemy_jump
+ clock_pause(nil)
 end
 
 function update_enemy_getup(o)
@@ -1656,6 +1682,7 @@ function start_enemy_hurt(o)
   music(-1)
  end
  sfx(snds.expl2)
+ clock_pause(true)
 end
 
 function enemy_move_x(o)
@@ -1875,6 +1902,10 @@ MUSIC
 end
 
 function update_game()
+ if not clockpaused
+ and clock<clocklimit then
+  clock=clock+1
+ end
  update_objs()
  cleanup_dead_objs()
  cleanup(enbombs,obj_dead)
@@ -1897,6 +1928,7 @@ function draw_game()
  draw_objs()
  camera()
  draw_life(ninja.life)
+ draw_clock()
  if hazeptn and hazeclr then
   fillp(hazeptn)
   rectfill(0,0,128,128,hazeclr)
@@ -1904,7 +1936,7 @@ function draw_game()
 end
 
 function start_game()
- local lvl=4
+ local lvl=nil
  cam.x=0
  cam.y=worldbtm-128
  if lvl then
