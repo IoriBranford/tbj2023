@@ -602,6 +602,19 @@ function obj_fall_out_y(o)
  end
 end
 
+function update_obj_disintegrate(o)
+ update_obj_ani(o)
+ o.x=o.x+(o.vx or 0)
+ o.y=o.y+(o.vy or 0)
+ if o.age>40 then
+  kill_obj(o)
+ elseif o.age>20 then
+  o.fillp=░
+ else
+  o.fillp=▒
+ end
+end
+
 -->8
 --bombs
 local splitbombwholegrav=-1/16
@@ -1577,23 +1590,11 @@ end
 function enemy_change(o)
  add_obj_spr({
   x=o.x,y=o.y,
+  vy=-.5,
   w=o.w,h=o.h,
   flpx=o.flpx,
   ani=o.ani,
-  draw=function(o)
-   fillp((o.age<=20
-    and ▒ or ░)
-    +0b.01)
-   draw_obj_spr(o)
-   fillp()
-  end,
-  update=function(o)
-   update_obj_ani(o)
-   o.y=o.y-.5
-   if o.age>40 then
-    kill_obj(o)
-   end
-  end
+  update=update_obj_disintegrate
  })
  o.sprset=sprs.enemyskull
 end
