@@ -497,7 +497,8 @@ local sprs={
   fwd=0,
   down=2,
   up=4
- }
+ },
+ gameover=7
 }
 apply_sprs_bases(sprs)
 
@@ -1949,6 +1950,11 @@ function draw_game()
  camera()
  draw_life(ninja.life)
  draw_clock()
+ if obj_dead(ninja) then
+  spr(sprs.gameover,
+   64-16,64-8,
+   4,2)
+ end
  if hazeptn and hazeclr then
   fillp(hazeptn)
   rectfill(0,0,128,128,hazeclr)
