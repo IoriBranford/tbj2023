@@ -91,6 +91,13 @@ function aabbs(x,y,w,h,a,b,m,n)
   and y+h>b and y<b+n
 end
 
+function unitv(a,b,x,y)
+ local dx,dy=x-a,y-b
+ local dsq=dx*dx+dy*dy
+ local dist=sqrt(dsq)
+ return dx/dist,dy/dist
+end
+
 -->8
 --object
 
