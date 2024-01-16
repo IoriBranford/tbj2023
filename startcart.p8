@@ -1529,8 +1529,8 @@ end
 --enemy
 
 local enemyrunspd=2
-local enemyhopvely=-2
-local enemyhopgrav=1/32
+local enemyhopvely=-4
+local enemyhopgrav=1/4
 local enemyhurtvely=-2
 local enemyhurttime=60
 local enemyjumpvely=-4
