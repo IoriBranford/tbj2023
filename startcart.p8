@@ -877,6 +877,11 @@ end
 
 function update_fbomb_preexpl(o)
  update_obj_ani(o)
+ local target=o.target
+ local cx,cy=obj_spr_center(o)
+ local tx,ty=obj_spr_center(target)
+ local vx,vy=unitv(cx,cy,tx,ty)
+ o.vx,o.vy=vx*.5,vy*.5
  o.x,o.y=o.x+o.vx,o.y+o.vy
  local t=(o.t or 30)-1
  o.t=t
