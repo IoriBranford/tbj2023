@@ -416,6 +416,13 @@ local sprs={
  flamepuff={t=3,pal={[6]=9,[5]=8},
   {i=28,sfx=snds.fwall},29,30,31
  },
+ godbomb={t=1,
+  {i=0,palt=0b1111110011111111,pal={[6]=7,[7]=12}},
+  {i=0,palt=0b1111110111111011,pal={[6]=7,[13]=12}},
+  {i=0,palt=0b1011110111111111,pal={[6]=7,[1]=12}},
+  {i=0,palt=0b1101110111111111,pal={[6]=7,[2]=12}},
+  {i=0,palt=0b1111100111111111,pal={[6]=7,[5]=12}},
+ },
  enemyskull={
   _base=88,
   run={t=6,0,4},
@@ -663,6 +670,7 @@ local splitbombhalfgrav=1/16
 local fwallgrav=-1/32
 local flamegrav=-1/32
 local fbombexpldist=16
+local godbombspeed=3
 local splitbombmaxvely=1.5
 local fusecolors={8,14,7}
 
@@ -912,6 +920,26 @@ function update_fbomb_fall(o)
  end
 end
 
+function update_godbomb_fly(o)
+ o.x,o.y=o.x+o.vx,o.y+o.vy
+ update_obj_ani(o)
+ obj_fall_out_y(o)
+end
+
+function update_godbomb_prefly(o)
+ o.y=o.y+o.vy
+ o.dist=(o.dist or 0)+abs(o.vy)
+ if o.dist>=16 then
+  local cx,cy=obj_spr_center(o)
+  local tx=o.target.x+(o.target.w<<2)
+  local ty=o.target.y
+  local vx,vy=unitv(cx,cy,tx,ty)
+  o.vx,o.vy=vx*godbombspeed,vy*godbombspeed
+  o.update=update_godbomb_fly
+ end
+ update_obj_ani(o)
+end
+
 function update_bomb_fuse(o)
  o.fuse=o.fuse-1
  if o.fuse<=0 then
@@ -973,6 +1001,13 @@ local bombtmpls={
   ani=sprs.fbomb,
   update=update_fbomb_fall,
   updateonthrow=update_fbomb_fall,
+ },
+ godbomb={
+  fuse=180,
+  vy=.5,
+  ani=sprs.godbomb,
+  update=update_godbomb_prefly,
+  updateonthrow=update_godbomb_prefly,
  }
 }
 
@@ -1828,7 +1863,7 @@ enemylevels={
  },
  [5]={
   music=snds.finalmus,
-  bombtmpl=bombtmpls.fbomb,
+  bombtmpl=bombtmpls.godbomb,
   movefunc=update_enemy_run,
   firedistx=32,
  }
