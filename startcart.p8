@@ -1752,7 +1752,6 @@ function enemy_try_fire(o)
   local dx=ninja.x+(ninja.w<<2)
    -(o.x+(o.w<<2))
   if abs(dx)<firedistx then
-   o.flpx=dx<0
    start_enemy_shot(o)
    return true
   end
