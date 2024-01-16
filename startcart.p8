@@ -278,6 +278,11 @@ function add_obj_spr(o)
  return o
 end
 
+function obj_spr_center(o)
+ return o.x+(o.w<<2),
+  o.y+(o.h<<2)
+end
+
 function obj_frm_ending(o)
  return (o.ft or 1)<=1
 end
@@ -735,8 +740,7 @@ function add_flame_expl(cx,cy)
 end
 
 function bomb_explode(o)
- o.addexpl(o.x+(o.w<<2),
-  o.y+(o.h<<2))
+ o.addexpl(obj_spr_center(o))
  kill_obj(o)
 end
 
@@ -848,9 +852,7 @@ function update_fwall_flame(o)
  o.x,o.y=o.x+vx,o.y+vy
  update_obj_ani(o)
  if o.dist>=80 then
-  add_flame_puffs(
-   o.x+(o.w<<2),
-   o.y+(o.h<<2))
+  add_flame_puffs(obj_spr_center(o))
   kill_obj(o)
  end
 end
@@ -859,9 +861,7 @@ function update_fbomb_expls(o)
  if o.age%6==0 then
   local dist=(o.expldist or 0)+4
   o.expldist=dist
-  local cx,cy=
-   o.x+(o.w<<2),
-   o.y+(o.h<<2)
+  local cx,cy=obj_spr_center(o)
   for dy=-1,1,2 do
    for dx=-1,1,2 do
     add(expls,add_normal_expl(
