@@ -1280,7 +1280,7 @@ function nin_find_coming_bomb(o)
 end
 
 function nin_try_catch_bomb(o)
- if not btnp(⬆️) then
+ if not btnp(⬆️) and not btnp(❎) then
   return
  end
  local bomb=o.bomb
@@ -1484,7 +1484,7 @@ function draw_ninja(o)
     print("⬅️\n🅾️",o.x-8,o.y,7)
     print("➡️\n🅾️",o.x+8,o.y,7)
    else
-    print("⬆️",x+1,y,clr)
+    print("❎",x+1,y,clr)
    end
    fillp()
   end
