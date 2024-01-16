@@ -1075,6 +1075,7 @@ function update_nin_death(o)
    sfx(-1)
    music(snds.deadmus)
    kill_obj(o)
+   clock_pause(true)
   end
  end
 end
