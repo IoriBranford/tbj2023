@@ -427,7 +427,19 @@ local sprs={
  enemyskull={
   _base=88,
   run={t=6,0,4},
-  throw={i=2,t=30},
+  warpout={t=6,
+   {i=0,fillp=▒},
+   {i=4,fillp=▒},
+   {i=0,fillp=░},
+   {i=4,fillp=░},
+  },
+  warpin={t=6,
+   {i=0,fillp=░},
+   {i=4,fillp=░},
+   {i=0,fillp=▒},
+   {i=4,fillp=▒},
+  },
+  throw={i=2,t=30,sfx=snds.bdrop},
   jump=2,
   knocked={t=3,
    {i=4,pal=pals.burn1},
@@ -1655,6 +1667,33 @@ function start_enemy_jump(o)
  clock_pause(nil)
 end
 
+function update_enemy_warpin(o)
+ update_obj_ani(o,o.sprset.warpin)
+ if obj_ani_ending(o) then
+  start_enemy_shot(o)
+ end
+end
+
+function update_enemy_hiding(o)
+ o.hidetime=o.hidetime+1
+ if o.hidetime>120 then
+  o.x=8+rnd(96)
+  o.flpx=ninja.x<o.x
+  o.hidden=false
+  o.hidetime=nil
+  o.update=update_enemy_warpin
+ end
+end
+
+function update_enemy_warpout(o)
+ update_obj_ani(o,o.sprset.warpout)
+ if obj_ani_ending(o) then
+  o.hidden=true
+  o.hidetime=0
+  o.update=update_enemy_hiding
+ end
+end
+
 function update_enemy_getup(o)
  update_obj_ani(o,o.sprset.getup)
  if obj_ani_ending(o) then
@@ -1866,10 +1905,16 @@ enemylevels={
  [5]={
   music=snds.finalmus,
   bombtmpl=bombtmpls.godbomb,
-  movefunc=update_enemy_run,
+  movefunc=update_enemy_warpout,
   firedistx=32,
  }
 }
+
+function draw_enemy(o)
+ if not o.hidden then
+  draw_obj_spr(o)
+ end
+end
 
 function add_enemy(lvl)
  lvl=lvl or 1
@@ -1877,7 +1922,8 @@ function add_enemy(lvl)
   x=56,y=mapbtm-128*(1+lvl),
   vx=0,vy=0,
   w=2,h=2,
-  sprset=sprs.enemy
+  sprset=sprs.enemy,
+  draw=draw_enemy
  }
  o.floory=o.y
  set_enemy_level(o,lvl)
