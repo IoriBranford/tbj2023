@@ -1709,10 +1709,16 @@ function update_enemy_dying(o)
  local i=(o.dyingtime or 0)+1
  o.dyingtime=i
  if i<=300 then
+  if i>240 then
+   o.fillp=░
+  elseif i>180 then
+   o.fillp=▒
+  end
   if i%6==0 then
    add_normal_expl(o.x+rnd(16),o.y+rnd(16))
   end
   if i==300 then
+   o.hidden=true
    hazeptn=░
    hazeclr=0
   end
