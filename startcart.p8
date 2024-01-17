@@ -943,10 +943,13 @@ function update_godbomb_prefly(o)
  o.y=o.y+o.vy
  o.dist=(o.dist or 0)+abs(o.vy)
  if o.dist>=16 then
-  local cx,cy=obj_spr_center(o)
-  local tx=o.target.x+(o.target.w<<2)
-  local ty=o.target.y
-  local vx,vy=unitv(cx,cy,tx,ty)
+  local vx,vy=0,-1
+  if not o.target.hidden then
+   local cx,cy=obj_spr_center(o)
+   local tx=o.target.x+(o.target.w<<2)
+   local ty=o.target.y
+   vx,vy=unitv(cx,cy,tx,ty)
+  end
   o.vx,o.vy=vx*godbombspeed,vy*godbombspeed
   o.update=update_godbomb_fly
   sfx(snds.godbomb)
