@@ -1515,7 +1515,7 @@ function add_plane()
 end
 
 function draw_ninja(o)
- if (o.invul or 0)%2==0 then
+ if (o.invul or 0)%4<=1 then
   draw_obj_spr(o)
  end
  if nin_catch_allowed(o)
